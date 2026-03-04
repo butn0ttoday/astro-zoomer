@@ -4,7 +4,6 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from kerykeion import AstrologicalSubject, NatalAspects, SynastryAspects
-from kerykeion.charts import KerykeionChartSVG
 import json
 import os
 from datetime import datetime
