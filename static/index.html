@@ -6,592 +6,112 @@
 <title>LUMINA — Astrology Engine</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;600&family=Inter:wght@300;400&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --void: #050508;
-    --deep: #0a0a12;
-    --surface: #11111e;
-    --rim: #1e1e30;
-    --gold: #c9a84c;
-    --gold-dim: #8a6e30;
-    --silver: #a8afc0;
-    --silver-dim: #4a5168;
-    --text: #d4d8e8;
-    --text-dim: #6a7080;
-    --accent: #7b6cff;
-    --accent-glow: rgba(123, 108, 255, 0.15);
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--void);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    font-weight: 300;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* Stars background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4) 0%, transparent 100%),
-      radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
-      radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
-      radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
-      radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.4) 0%, transparent 100%),
-      radial-gradient(1px 1px at 20% 90%, rgba(255,255,255,0.2) 0%, transparent 100%),
-      radial-gradient(1px 1px at 60% 50%, rgba(255,255,255,0.3) 0%, transparent 100%),
-      radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.4) 0%, transparent 100%),
-      radial-gradient(1px 1px at 40% 75%, rgba(255,255,255,0.2) 0%, transparent 100%),
-      radial-gradient(1px 1px at 15% 45%, rgba(255,255,255,0.3) 0%, transparent 100%),
-      radial-gradient(2px 2px at 85% 65%, rgba(201,168,76,0.3) 0%, transparent 100%),
-      radial-gradient(2px 2px at 45% 30%, rgba(123,108,255,0.3) 0%, transparent 100%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Nebula glow */
-  body::after {
-    content: '';
-    position: fixed;
-    width: 600px;
-    height: 600px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(123,108,255,0.04) 0%, transparent 70%);
-    top: -100px;
-    right: -100px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .container {
-    position: relative;
-    z-index: 1;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 24px;
-  }
-
-  /* Header */
-  header {
-    text-align: center;
-    padding: 80px 0 60px;
-    position: relative;
-  }
-
-  .sigil {
-    width: 70px;
-    height: 70px;
-    margin: 0 auto 24px;
-    position: relative;
-  }
-
-  .sigil svg {
-    width: 100%;
-    height: 100%;
-    animation: spin 40s linear infinite;
-  }
-
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-
-  h1 {
-    font-family: 'Cinzel', serif;
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    font-weight: 600;
-    letter-spacing: 0.3em;
-    color: var(--gold);
-    text-shadow: 0 0 40px rgba(201,168,76,0.3);
-    margin-bottom: 8px;
-  }
-
-  .tagline {
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-size: 1.1rem;
-    color: var(--silver-dim);
-    letter-spacing: 0.1em;
-  }
-
-  /* Navigation tabs */
-  nav {
-    display: flex;
-    justify-content: center;
-    gap: 0;
-    margin-bottom: 60px;
-    border: 1px solid var(--rim);
-    border-radius: 2px;
-    overflow: hidden;
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .tab {
-    font-family: 'Cinzel', serif;
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    padding: 14px 32px;
-    cursor: pointer;
-    color: var(--text-dim);
-    background: var(--deep);
-    border: none;
-    border-right: 1px solid var(--rim);
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-  }
-
-  .tab:last-child { border-right: none; }
-
-  .tab:hover { color: var(--gold); background: var(--surface); }
-
-  .tab.active {
-    color: var(--gold);
-    background: var(--surface);
-    box-shadow: inset 0 -2px 0 var(--gold);
-  }
-
-  /* Panels */
-  .panel { display: none; animation: fadeIn 0.5s ease; }
-  .panel.active { display: block; }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* Form */
-  .form-card {
-    background: var(--surface);
-    border: 1px solid var(--rim);
-    padding: 40px;
-    position: relative;
-    margin-bottom: 32px;
-  }
-
-  .form-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
-  }
-
-  .form-title {
-    font-family: 'Cinzel', serif;
-    font-size: 0.75rem;
-    letter-spacing: 0.25em;
-    color: var(--gold-dim);
-    text-transform: uppercase;
-    margin-bottom: 28px;
-  }
-
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .form-group.full { grid-column: 1 / -1; }
-
-  label {
-    font-size: 0.65rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--silver-dim);
-  }
-
-  input, select {
-    background: var(--deep);
-    border: 1px solid var(--rim);
-    color: var(--text);
-    padding: 12px 16px;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 300;
-    outline: none;
-    transition: border-color 0.3s;
-    -webkit-appearance: none;
-    border-radius: 0;
-  }
-
-  input:focus, select:focus { border-color: var(--gold-dim); }
-
-  select option { background: var(--deep); }
-
-  .btn {
-    font-family: 'Cinzel', serif;
-    font-size: 0.75rem;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    padding: 16px 48px;
-    background: transparent;
-    border: 1px solid var(--gold-dim);
-    color: var(--gold);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 8px;
-  }
-
-  .btn:hover {
-    background: rgba(201,168,76,0.08);
-    border-color: var(--gold);
-    box-shadow: 0 0 20px rgba(201,168,76,0.1);
-  }
-
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  /* Results */
-  .result-card {
-    background: var(--surface);
-    border: 1px solid var(--rim);
-    padding: 40px;
-    position: relative;
-    animation: fadeIn 0.6s ease;
-  }
-
-  .result-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
-  }
-
-  /* Big 3 */
-  .big3 {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    background: var(--rim);
-    margin-bottom: 40px;
-  }
-
-  .big3-item {
-    background: var(--deep);
-    padding: 28px 20px;
-    text-align: center;
-  }
-
-  .big3-label {
-    font-size: 0.6rem;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 8px;
-  }
-
-  .big3-symbol {
-    font-size: 2rem;
-    margin-bottom: 6px;
-    display: block;
-  }
-
-  .big3-sign {
-    font-family: 'Cinzel', serif;
-    font-size: 1rem;
-    color: var(--gold);
-    letter-spacing: 0.1em;
-  }
-
-  /* Planets table */
-  .section-title {
-    font-family: 'Cinzel', serif;
-    font-size: 0.65rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--gold-dim);
-    margin-bottom: 20px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--rim);
-  }
-
-  .planet-row {
-    display: grid;
-    grid-template-columns: 140px 1fr 80px 100px;
-    gap: 16px;
-    padding: 14px 0;
-    border-bottom: 1px solid rgba(30,30,48,0.8);
-    align-items: center;
-    font-size: 0.85rem;
-  }
-
-  .planet-name {
-    color: var(--silver);
-    font-weight: 400;
-  }
-
-  .planet-sign {
-    color: var(--text);
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1rem;
-  }
-
-  .planet-deg {
-    color: var(--text-dim);
-    font-size: 0.75rem;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .retro {
-    font-size: 0.6rem;
-    letter-spacing: 0.1em;
-    color: var(--accent);
-    background: var(--accent-glow);
-    padding: 3px 8px;
-    border: 1px solid rgba(123,108,255,0.2);
-  }
-
-  /* Horoscope */
-  .horoscope-text {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.2rem;
-    line-height: 1.8;
-    color: var(--silver);
-    font-style: italic;
-    padding: 24px 0;
-    border-top: 1px solid var(--rim);
-    border-bottom: 1px solid var(--rim);
-    margin: 24px 0;
-  }
-
-  /* Compatibility score */
-  .score-ring {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 32px 0;
-  }
-
-  .score-number {
-    font-family: 'Cinzel', serif;
-    font-size: 5rem;
-    color: var(--gold);
-    line-height: 1;
-    text-shadow: 0 0 40px rgba(201,168,76,0.3);
-  }
-
-  .score-label {
-    font-size: 0.65rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-top: 8px;
-  }
-
-  .score-bar {
-    width: 100%;
-    height: 2px;
-    background: var(--rim);
-    margin: 24px 0;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .score-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--gold-dim), var(--gold));
-    transition: width 1s ease;
-    box-shadow: 0 0 10px rgba(201,168,76,0.4);
-  }
-
-  .aspects-grid {
-    display: grid;
-    gap: 8px;
-    margin-top: 24px;
-  }
-
-  .aspect-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 16px;
-    background: var(--deep);
-    border: 1px solid var(--rim);
-    font-size: 0.8rem;
-  }
-
-  .aspect-type {
-    font-family: 'Cinzel', serif;
-    font-size: 0.65rem;
-    letter-spacing: 0.1em;
-    padding: 3px 10px;
-  }
-
-  .aspect-type.trine, .aspect-type.sextile { color: #6bcb8a; background: rgba(107,203,138,0.08); border: 1px solid rgba(107,203,138,0.2); }
-  .aspect-type.conjunction { color: var(--gold); background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.2); }
-  .aspect-type.square, .aspect-type.opposition { color: #e87070; background: rgba(232,112,112,0.08); border: 1px solid rgba(232,112,112,0.2); }
-
-  /* Horoscope signs grid */
-  .signs-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1px;
-    background: var(--rim);
-    margin-bottom: 32px;
-  }
-
-  .sign-btn {
-    background: var(--deep);
-    border: none;
-    padding: 20px 12px;
-    cursor: pointer;
-    text-align: center;
-    transition: background 0.2s;
-    color: var(--text-dim);
-  }
-
-  .sign-btn:hover { background: var(--surface); color: var(--gold); }
-  .sign-btn.active { background: var(--surface); color: var(--gold); }
-
-  .sign-btn .symbol { font-size: 1.5rem; display: block; margin-bottom: 4px; }
-  .sign-btn .name { font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.15em; }
-
-  .horoscope-result {
-    background: var(--deep);
-    border: 1px solid var(--rim);
-    padding: 32px;
-    position: relative;
-    animation: fadeIn 0.4s ease;
-  }
-
-  .horoscope-result::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
-  }
-
-  .horoscope-sign-title {
-    font-family: 'Cinzel', serif;
-    font-size: 1.4rem;
-    color: var(--gold);
-    letter-spacing: 0.15em;
-    margin-bottom: 4px;
-  }
-
-  .horoscope-date {
-    font-size: 0.7rem;
-    letter-spacing: 0.15em;
-    color: var(--text-dim);
-    margin-bottom: 20px;
-    text-transform: uppercase;
-  }
-
-  .horoscope-body {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.15rem;
-    line-height: 1.9;
-    color: var(--silver);
-    font-style: italic;
-  }
-
-  .compat-summary {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.15rem;
-    line-height: 1.8;
-    color: var(--silver);
-    font-style: italic;
-    margin: 24px 0;
-    padding: 24px;
-    border-left: 2px solid var(--gold-dim);
-  }
-
-  /* Divider */
-  .divider {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin: 40px 0;
-    color: var(--text-dim);
-    font-size: 0.6rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-  }
-
-  .divider::before, .divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--rim);
-  }
-
-  /* Loading */
-  .loading {
-    text-align: center;
-    padding: 60px;
-    color: var(--text-dim);
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-size: 1.1rem;
-  }
-
-  .loading::after {
-    content: '';
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 1px solid var(--rim);
-    border-top-color: var(--gold);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-left: 12px;
-    vertical-align: middle;
-  }
-
-  /* Error */
-  .error {
-    padding: 20px;
-    border: 1px solid rgba(232,112,112,0.3);
-    background: rgba(232,112,112,0.05);
-    color: #e87070;
-    font-size: 0.85rem;
-    margin-top: 16px;
-  }
-
-  footer {
-    text-align: center;
-    padding: 60px 0 40px;
-    color: var(--text-dim);
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-  }
-
-  @media (max-width: 600px) {
-    .form-grid { grid-template-columns: 1fr; }
-    .big3 { grid-template-columns: 1fr; }
-    .planet-row { grid-template-columns: 1fr 1fr; }
-    .signs-grid { grid-template-columns: repeat(3, 1fr); }
-    .tab { padding: 12px 16px; font-size: 0.6rem; }
-  }
+:root{--void:#050508;--deep:#0a0a12;--surface:#11111e;--rim:#1e1e30;--gold:#c9a84c;--gold-dim:#8a6e30;--silver:#a8afc0;--silver-dim:#4a5168;--text:#d4d8e8;--text-dim:#6a7080;--accent:#7b6cff;--fire:#e8906a;--earth:#8ab56a;--air:#6ab5d4;--water:#7b6cff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--void);color:var(--text);font-family:'Inter',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(1px 1px at 10% 20%,rgba(255,255,255,.4) 0%,transparent 100%),radial-gradient(1px 1px at 30% 60%,rgba(255,255,255,.3) 0%,transparent 100%),radial-gradient(1px 1px at 50% 10%,rgba(255,255,255,.5) 0%,transparent 100%),radial-gradient(1px 1px at 70% 80%,rgba(255,255,255,.3) 0%,transparent 100%),radial-gradient(1px 1px at 90% 40%,rgba(255,255,255,.4) 0%,transparent 100%),radial-gradient(2px 2px at 85% 65%,rgba(201,168,76,.3) 0%,transparent 100%),radial-gradient(2px 2px at 45% 30%,rgba(123,108,255,.3) 0%,transparent 100%);pointer-events:none;z-index:0}
+.container{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px}
+header{text-align:center;padding:70px 0 50px}
+.sigil{width:60px;height:60px;margin:0 auto 20px}
+.sigil svg{width:100%;height:100%;animation:spin 40s linear infinite}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+h1{font-family:'Cinzel',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:600;letter-spacing:.35em;color:var(--gold);text-shadow:0 0 40px rgba(201,168,76,.3);margin-bottom:6px}
+.tagline{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.05rem;color:var(--silver-dim);letter-spacing:.1em}
+nav{display:flex;justify-content:center;margin-bottom:50px;border:1px solid var(--rim);overflow:hidden;width:fit-content;margin-left:auto;margin-right:auto}
+.tab{font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:.2em;padding:13px 30px;cursor:pointer;color:var(--text-dim);background:var(--deep);border:none;border-right:1px solid var(--rim);transition:all .3s ease;text-transform:uppercase}
+.tab:last-child{border-right:none}
+.tab:hover{color:var(--gold);background:var(--surface)}
+.tab.active{color:var(--gold);background:var(--surface);box-shadow:inset 0 -2px 0 var(--gold)}
+.panel{display:none;animation:fadeIn .5s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.form-card{background:var(--surface);border:1px solid var(--rim);padding:36px;position:relative;margin-bottom:28px}
+.form-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent)}
+.form-title{font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.25em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:24px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.form-group{display:flex;flex-direction:column;gap:7px}
+.form-group.full{grid-column:1/-1}
+label{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--silver-dim)}
+input,select{background:var(--deep);border:1px solid var(--rim);color:var(--text);padding:11px 14px;font-family:'Inter',sans-serif;font-size:.88rem;font-weight:300;outline:none;transition:border-color .3s;border-radius:0;-webkit-appearance:none}
+input:focus,select:focus{border-color:var(--gold-dim)}
+.btn{font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.25em;text-transform:uppercase;padding:15px 44px;background:transparent;border:1px solid var(--gold-dim);color:var(--gold);cursor:pointer;transition:all .3s ease;margin-top:6px}
+.btn:hover{background:rgba(201,168,76,.08);border-color:var(--gold);box-shadow:0 0 20px rgba(201,168,76,.1)}
+.result-card{background:var(--surface);border:1px solid var(--rim);padding:36px;position:relative;animation:fadeIn .6s ease}
+.result-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent)}
+.big3{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rim);margin-bottom:32px}
+.big3-item{background:var(--deep);padding:24px 16px;text-align:center}
+.big3-label{font-size:.58rem;letter-spacing:.25em;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px}
+.big3-symbol{font-size:1.8rem;margin-bottom:4px;display:block}
+.big3-sign{font-family:'Cinzel',serif;font-size:.9rem;color:var(--gold);letter-spacing:.08em}
+.chart-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.wheel-box{background:var(--deep);border:1px solid var(--rim);padding:20px;display:flex;flex-direction:column;align-items:center;position:relative}
+.wheel-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent)}
+.planets-box{background:var(--deep);border:1px solid var(--rim);padding:20px;position:relative;overflow-y:auto;max-height:480px}
+.planets-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent)}
+.section-title{font-family:'Cinzel',serif;font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--rim);width:100%}
+.planet-row{display:grid;grid-template-columns:24px 1fr 90px 52px 32px;gap:8px;padding:8px 0;border-bottom:1px solid rgba(30,30,48,.8);align-items:center;font-size:.8rem}
+.p-sym{font-size:.95rem;text-align:center;color:var(--gold)}
+.p-name{color:var(--silver)}
+.p-sign{font-family:'Cormorant Garamond',serif;font-size:.95rem}
+.p-deg{color:var(--text-dim);font-size:.7rem;font-variant-numeric:tabular-nums}
+.p-house{color:var(--silver-dim);font-size:.65rem}
+.retro{font-size:.55rem;color:#7b6cff;background:rgba(123,108,255,.1);padding:1px 5px;border:1px solid rgba(123,108,255,.2)}
+.elem-fire{color:var(--fire)}
+.elem-earth{color:var(--earth)}
+.elem-air{color:var(--air)}
+.elem-water{color:var(--water)}
+.aspects-section{background:var(--deep);border:1px solid var(--rim);padding:20px;position:relative;margin-bottom:20px}
+.aspects-section::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent)}
+.aspects-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.asp-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--surface);border:1px solid var(--rim);font-size:.75rem}
+.asp-planets{color:var(--silver)}
+.asp-badge{font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:.06em;padding:2px 7px;border:1px solid}
+.asp-trine,.asp-sextile{color:#6bcb8a;border-color:rgba(107,203,138,.3);background:rgba(107,203,138,.06)}
+.asp-conjunction{color:var(--gold);border-color:rgba(201,168,76,.3);background:rgba(201,168,76,.06)}
+.asp-opposition,.asp-square{color:#e87070;border-color:rgba(232,112,112,.3);background:rgba(232,112,112,.06)}
+.asp-quincunx{color:var(--silver-dim);border-color:rgba(74,81,104,.3);background:rgba(74,81,104,.06)}
+.houses-section{background:var(--deep);border:1px solid var(--rim);padding:20px;position:relative;margin-bottom:20px}
+.houses-section::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent)}
+.houses-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.house-item{background:var(--surface);border:1px solid var(--rim);padding:10px 6px;text-align:center}
+.h-num{font-family:'Cinzel',serif;font-size:.55rem;color:var(--gold-dim);letter-spacing:.08em;margin-bottom:3px}
+.h-sign{font-family:'Cormorant Garamond',serif;font-size:.9rem;color:var(--text)}
+.h-deg{font-size:.6rem;color:var(--text-dim);margin-top:1px}
+.horoscope-text{font-family:'Cormorant Garamond',serif;font-size:1.1rem;line-height:1.8;color:var(--silver);font-style:italic;padding:18px 0;border-top:1px solid var(--rim);border-bottom:1px solid var(--rim);margin:18px 0}
+.score-ring{display:flex;flex-direction:column;align-items:center;margin:24px 0}
+.score-num{font-family:'Cinzel',serif;font-size:5rem;color:var(--gold);line-height:1;text-shadow:0 0 40px rgba(201,168,76,.3)}
+.score-lbl{font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:var(--text-dim);margin-top:6px}
+.score-bar{width:100%;height:2px;background:var(--rim);margin:18px 0;overflow:hidden}
+.score-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));transition:width 1s ease;box-shadow:0 0 10px rgba(201,168,76,.4)}
+.compat-summary{font-family:'Cormorant Garamond',serif;font-size:1.1rem;line-height:1.8;color:var(--silver);font-style:italic;margin:18px 0;padding:18px 22px;border-left:2px solid var(--gold-dim)}
+.signs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rim);margin-bottom:24px}
+.sign-btn{background:var(--deep);border:none;padding:16px 8px;cursor:pointer;text-align:center;transition:background .2s;color:var(--text-dim)}
+.sign-btn:hover,.sign-btn.active{background:var(--surface);color:var(--gold)}
+.sign-btn .sy{font-size:1.3rem;display:block;margin-bottom:2px}
+.sign-btn .sn{font-family:'Cinzel',serif;font-size:.55rem;letter-spacing:.1em}
+.horo-result{background:var(--deep);border:1px solid var(--rim);padding:26px;position:relative;animation:fadeIn .4s ease}
+.horo-result::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent)}
+.horo-title{font-family:'Cinzel',serif;font-size:1.25rem;color:var(--gold);letter-spacing:.12em;margin-bottom:4px}
+.horo-date{font-size:.64rem;letter-spacing:.15em;color:var(--text-dim);margin-bottom:16px;text-transform:uppercase}
+.horo-body{font-family:'Cormorant Garamond',serif;font-size:1.1rem;line-height:1.9;color:var(--silver);font-style:italic}
+.divider{display:flex;align-items:center;gap:14px;margin:28px 0;color:var(--text-dim);font-size:.58rem;letter-spacing:.3em;text-transform:uppercase}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--rim)}
+.loading{text-align:center;padding:50px;color:var(--text-dim);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.05rem}
+.loading::after{content:'';display:inline-block;width:18px;height:18px;border:1px solid var(--rim);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin-left:10px;vertical-align:middle}
+.error{padding:16px;border:1px solid rgba(232,112,112,.3);background:rgba(232,112,112,.05);color:#e87070;font-size:.82rem;margin-top:12px}
+footer{text-align:center;padding:50px 0 36px;color:var(--text-dim);font-size:.64rem;letter-spacing:.2em;text-transform:uppercase}
+@media(max-width:700px){.form-grid,.big3,.chart-layout,.aspects-grid,.houses-grid{grid-template-columns:1fr!important}.signs-grid{grid-template-columns:repeat(3,1fr)}.tab{padding:10px 12px;font-size:.56rem}}
 </style>
 </head>
 <body>
-
 <div class="container">
   <header>
     <div class="sigil">
-      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg viewBox="0 0 100 100" fill="none">
         <circle cx="50" cy="50" r="45" stroke="#c9a84c" stroke-width="0.5" stroke-opacity="0.4"/>
         <circle cx="50" cy="50" r="35" stroke="#c9a84c" stroke-width="0.3" stroke-opacity="0.3"/>
         <circle cx="50" cy="50" r="3" fill="#c9a84c" fill-opacity="0.8"/>
-        <!-- Star of David-like pattern -->
         <polygon points="50,8 58,28 80,20 68,40 88,50 68,60 80,80 58,72 50,92 42,72 20,80 32,60 12,50 32,40 20,20 42,28" stroke="#c9a84c" stroke-width="0.4" stroke-opacity="0.3" fill="none"/>
-        <!-- Cross -->
         <line x1="50" y1="5" x2="50" y2="95" stroke="#c9a84c" stroke-width="0.3" stroke-opacity="0.2"/>
         <line x1="5" y1="50" x2="95" y2="50" stroke="#c9a84c" stroke-width="0.3" stroke-opacity="0.2"/>
       </svg>
@@ -601,88 +121,66 @@
   </header>
 
   <nav>
-    <button class="tab active" onclick="switchTab('chart')">Birth Chart</button>
-    <button class="tab" onclick="switchTab('compat')">Compatibility</button>
-    <button class="tab" onclick="switchTab('horoscope')">Horoscope</button>
+    <button class="tab active" onclick="switchTab('chart',this)">Birth Chart</button>
+    <button class="tab" onclick="switchTab('compat',this)">Compatibility</button>
+    <button class="tab" onclick="switchTab('horoscope',this)">Horoscope</button>
   </nav>
 
-  <!-- BIRTH CHART PANEL -->
   <div class="panel active" id="panel-chart">
     <div class="form-card">
       <div class="form-title">◈ Cast Your Natal Chart</div>
       <div class="form-grid">
-        <div class="form-group full">
-          <label>Full Name</label>
-          <input type="text" id="c-name" placeholder="Your name" />
-        </div>
-        <div class="form-group">
-          <label>Date of Birth</label>
-          <input type="date" id="c-date" />
-        </div>
-        <div class="form-group">
-          <label>Time of Birth</label>
-          <input type="time" id="c-time" value="12:00" />
-        </div>
-        <div class="form-group">
-          <label>City</label>
-          <input type="text" id="c-city" placeholder="e.g. London" />
-        </div>
-        <div class="form-group">
-          <label>Country Code</label>
-          <input type="text" id="c-nation" placeholder="e.g. GB" maxlength="3" />
-        </div>
+        <div class="form-group full"><label>Full Name</label><input type="text" id="c-name" placeholder="Your name"/></div>
+        <div class="form-group"><label>Date of Birth</label><input type="date" id="c-date"/></div>
+        <div class="form-group"><label>Time of Birth</label><input type="time" id="c-time" value="12:00"/></div>
+        <div class="form-group"><label>City</label><input type="text" id="c-city" placeholder="e.g. London"/></div>
+        <div class="form-group"><label>Country Code (2 letters)</label><input type="text" id="c-nation" placeholder="e.g. GB" maxlength="3"/></div>
       </div>
-      <br>
-      <button class="btn" onclick="getChart()">Reveal Chart</button>
+      <br><button class="btn" onclick="getChart()">Reveal Chart</button>
     </div>
     <div id="chart-result"></div>
   </div>
 
-  <!-- COMPATIBILITY PANEL -->
   <div class="panel" id="panel-compat">
     <div class="form-card">
       <div class="form-title">◈ First Soul</div>
       <div class="form-grid">
-        <div class="form-group full"><label>Name</label><input type="text" id="p1-name" placeholder="First person" /></div>
-        <div class="form-group"><label>Date of Birth</label><input type="date" id="p1-date" /></div>
-        <div class="form-group"><label>Time of Birth</label><input type="time" id="p1-time" value="12:00" /></div>
-        <div class="form-group"><label>City</label><input type="text" id="p1-city" placeholder="e.g. Paris" /></div>
-        <div class="form-group"><label>Country Code</label><input type="text" id="p1-nation" placeholder="e.g. FR" maxlength="3" /></div>
+        <div class="form-group full"><label>Name</label><input type="text" id="p1-name" placeholder="First person"/></div>
+        <div class="form-group"><label>Date of Birth</label><input type="date" id="p1-date"/></div>
+        <div class="form-group"><label>Time of Birth</label><input type="time" id="p1-time" value="12:00"/></div>
+        <div class="form-group"><label>City</label><input type="text" id="p1-city" placeholder="e.g. Paris"/></div>
+        <div class="form-group"><label>Country Code</label><input type="text" id="p1-nation" placeholder="e.g. FR" maxlength="3"/></div>
       </div>
     </div>
-
     <div class="divider">and</div>
-
     <div class="form-card">
       <div class="form-title">◈ Second Soul</div>
       <div class="form-grid">
-        <div class="form-group full"><label>Name</label><input type="text" id="p2-name" placeholder="Second person" /></div>
-        <div class="form-group"><label>Date of Birth</label><input type="date" id="p2-date" /></div>
-        <div class="form-group"><label>Time of Birth</label><input type="time" id="p2-time" value="12:00" /></div>
-        <div class="form-group"><label>City</label><input type="text" id="p2-city" placeholder="e.g. Tokyo" /></div>
-        <div class="form-group"><label>Country Code</label><input type="text" id="p2-nation" placeholder="e.g. JP" maxlength="3" /></div>
+        <div class="form-group full"><label>Name</label><input type="text" id="p2-name" placeholder="Second person"/></div>
+        <div class="form-group"><label>Date of Birth</label><input type="date" id="p2-date"/></div>
+        <div class="form-group"><label>Time of Birth</label><input type="time" id="p2-time" value="12:00"/></div>
+        <div class="form-group"><label>City</label><input type="text" id="p2-city" placeholder="e.g. Tokyo"/></div>
+        <div class="form-group"><label>Country Code</label><input type="text" id="p2-nation" placeholder="e.g. JP" maxlength="3"/></div>
       </div>
     </div>
-
     <button class="btn" onclick="getCompatibility()">Read the Stars</button>
     <div id="compat-result"></div>
   </div>
 
-  <!-- HOROSCOPE PANEL -->
   <div class="panel" id="panel-horoscope">
     <div class="signs-grid">
-      <button class="sign-btn" onclick="getHoroscope('Aries', this)"><span class="symbol">♈</span><span class="name">Aries</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Taurus', this)"><span class="symbol">♉</span><span class="name">Taurus</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Gemini', this)"><span class="symbol">♊</span><span class="name">Gemini</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Cancer', this)"><span class="symbol">♋</span><span class="name">Cancer</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Leo', this)"><span class="symbol">♌</span><span class="name">Leo</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Virgo', this)"><span class="symbol">♍</span><span class="name">Virgo</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Libra', this)"><span class="symbol">♎</span><span class="name">Libra</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Scorpio', this)"><span class="symbol">♏</span><span class="name">Scorpio</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Sagittarius', this)"><span class="symbol">♐</span><span class="name">Sagittarius</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Capricorn', this)"><span class="symbol">♑</span><span class="name">Capricorn</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Aquarius', this)"><span class="symbol">♒</span><span class="name">Aquarius</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Pisces', this)"><span class="symbol">♓</span><span class="name">Pisces</span></button>
+      <button class="sign-btn" onclick="getHoroscope('Aries',this)"><span class="sy">♈</span><span class="sn">Aries</span></button>
+      <button class="sign-btn" onclick="getHoroscope('Taurus',this)"><span class="sy">♉</span><span class="sn">Taurus</span></button>
+      <button class="sign-btn" onclick="getHoroscope('Gemini',this)"><span class="sy">♊</span><span class="sn">Gemini</span></button>
+      <button class="sign-btn" onclick="getHoroscope('Cancer',this)"><span class="sy">♋</span><span class="sn">Cancer</span></button>
+      <button class="sign-btn" onclick="getHoroscope('Leo',this)"><span class="sy">♌</span><span class="sn">Leo</span></button>
+      <button class="sign-btn" onclick="getHoroscope('Virgo',this)"><span class="sy">♍</span><span class="sn">Virgo</span></button>
+      <button class="sign-btn" onclick="getHoroscope('Libra',this)"><span class="sy">♎</span><span class="sn">Libra</span></button>
+      <button class="sign-btn" onclick="getHoroscope('Scorpio',this)"><span class="sy">♏</span><span class="sn">Scorpio</span></button>
+      <button class="sign-btn" onclick="getHoroscope('Sagittarius',this)"><span class="sy">♐</span><span class="sn">Sagittarius</span></button>
+      <button class="sign-btn" onclick="getHoroscope('Capricorn',this)"><span class="sy">♑</span><span class="sn">Capricorn</span></button>
+      <button class="sign-btn" onclick="getHoroscope('Aquarius',this)"><span class="sy">♒</span><span class="sn">Aquarius</span></button>
+      <button class="sign-btn" onclick="getHoroscope('Pisces',this)"><span class="sy">♓</span><span class="sn">Pisces</span></button>
     </div>
     <div id="horoscope-result"></div>
   </div>
@@ -691,158 +189,226 @@
 </div>
 
 <script>
-const API = '';  // same origin
+const SIGN_SYMBOLS={'Aries':'♈','Taurus':'♉','Gemini':'♊','Cancer':'♋','Leo':'♌','Virgo':'♍','Libra':'♎','Scorpio':'♏','Sagittarius':'♐','Capricorn':'♑','Aquarius':'♒','Pisces':'♓'};
+const SIGN_SYMS=['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
+const SIGN_ELEM=['Fire','Earth','Air','Water','Fire','Earth','Air','Water','Fire','Earth','Air','Water'];
+const ELEM_COLORS={Fire:'#e8906a',Earth:'#8ab56a',Air:'#6ab5d4',Water:'#7b6cff'};
 
-const SIGN_SYMBOLS = {
-  'Aries':'♈','Taurus':'♉','Gemini':'♊','Cancer':'♋','Leo':'♌','Virgo':'♍',
-  'Libra':'♎','Scorpio':'♏','Sagittarius':'♐','Capricorn':'♑','Aquarius':'♒','Pisces':'♓'
-};
+function switchTab(n,el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));el.classList.add('active');document.getElementById('panel-'+n).classList.add('active')}
 
-function switchTab(name) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById('panel-' + name).classList.add('active');
+function parseBirth(pfx){
+  const dt=document.getElementById(pfx+'date').value;
+  const tm=document.getElementById(pfx+'time').value||'12:00';
+  if(!dt)return null;
+  const[y,mo,d]=dt.split('-').map(Number);
+  const[h,mi]=tm.split(':').map(Number);
+  return{name:document.getElementById(pfx+'name').value,year:y,month:mo,day:d,hour:h,minute:mi,city:document.getElementById(pfx+'city').value,nation:(document.getElementById(pfx+'nation').value||'US').toUpperCase()};
 }
 
-function parseBirth(prefix) {
-  const date = document.getElementById(prefix + 'date').value;
-  const time = document.getElementById(prefix + 'time').value || '12:00';
-  const [year, month, day] = date.split('-').map(Number);
-  const [hour, minute] = time.split(':').map(Number);
-  return {
-    name: document.getElementById(prefix + 'name').value,
-    year, month, day, hour, minute,
-    city: document.getElementById(prefix + 'city').value,
-    nation: document.getElementById(prefix + 'nation').value || 'US',
-  };
-}
+// ── CHART WHEEL ──────────────────────────────────────────────────────
+function r2d(r){return r*180/Math.PI}
+function d2r(d){return d*Math.PI/180}
+function pt(cx,cy,r,deg){const a=d2r(deg-90);return[cx+r*Math.cos(a),cy+r*Math.sin(a)]}
+function arc(cx,cy,r,a1,a2,large){const[x1,y1]=pt(cx,cy,r,a1);const[x2,y2]=pt(cx,cy,r,a2);return`M${x1},${y1} A${r},${r} 0 ${large},1 ${x2},${y2}`}
 
-async function getChart() {
-  const data = parseBirth('c-');
-  if (!data.name || !data.year || !data.city) {
-    document.getElementById('chart-result').innerHTML = '<div class="error">Please fill in name, date, and city.</div>';
-    return;
+function buildWheel(data){
+  const S=500,cx=250,cy=250;
+  const RO=230,RS=208,RSI=186,RH=183,RHI=155,RP=128,RA=100,RI=48;
+  const ascAbs=data.asc_abs||0;
+  const rot=a=>a+180-ascAbs;
+
+  let s=`<svg viewBox="0 0 ${S} ${S}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:420px">
+  <circle cx="${cx}" cy="${cy}" r="${RO}" fill="#08080f" stroke="#2a2a40" stroke-width="1.5"/>`;
+
+  // zodiac segments
+  for(let i=0;i<12;i++){
+    const a1=rot(i*30),a2=rot((i+1)*30);
+    const[x1,y1]=pt(cx,cy,RS,a1);const[x2,y2]=pt(cx,cy,RSI,a1);
+    const[x3,y3]=pt(cx,cy,RSI,a2);const[x4,y4]=pt(cx,cy,RS,a2);
+    const ec=ELEM_COLORS[SIGN_ELEM[i]]+'1a';
+    s+=`<path d="M${x1},${y1} A${RS},${RS} 0 0,1 ${x4},${y4} L${x3},${y3} A${RSI},${RSI} 0 0,0 ${x2},${y2} Z" fill="${ec}" stroke="#1e1e30" stroke-width="0.5"/>`;
+    const ma=rot(i*30+15);
+    const[sx,sy]=pt(cx,cy,(RS+RSI)/2,ma);
+    s+=`<text x="${sx}" y="${sy}" text-anchor="middle" dominant-baseline="central" font-size="13" fill="${ELEM_COLORS[SIGN_ELEM[i]]}" opacity="0.85">${SIGN_SYMS[i]}</text>`;
+    // degree tick at 0°
+    const[tx1,ty1]=pt(cx,cy,RS,a1);const[tx2,ty2]=pt(cx,cy,RSI+2,a1);
+    s+=`<line x1="${tx1}" y1="${ty1}" x2="${tx2}" y2="${ty2}" stroke="#2a2a40" stroke-width="0.6"/>`;
   }
-  document.getElementById('chart-result').innerHTML = '<div class="loading">Reading the heavens</div>';
-  try {
-    const res = await fetch(API + '/api/chart', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(data),
-    });
-    const d = await res.json();
-    if (!res.ok) throw new Error(d.detail);
+
+  // circles
+  s+=`<circle cx="${cx}" cy="${cy}" r="${RS}" fill="none" stroke="#2a2a40" stroke-width="1"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${RSI}" fill="none" stroke="#1e1e30" stroke-width="0.6"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${RH}" fill="none" stroke="#1e1e30" stroke-width="0.4"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${RHI}" fill="none" stroke="#1e1e30" stroke-width="0.8"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${RI}" fill="#060610" stroke="#1e1e30" stroke-width="1"/>`;
+
+  // house cusps
+  if(data.houses){data.houses.forEach((h,i)=>{
+    const ang=rot(h.abs_degree);
+    const[hx1,hy1]=pt(cx,cy,RH,ang);const[hx2,hy2]=pt(cx,cy,RI+4,ang);
+    const angular=[0,3,6,9].includes(i);
+    s+=`<line x1="${hx1}" y1="${hy1}" x2="${hx2}" y2="${hy2}" stroke="${angular?'#c9a84c':'#222236'}" stroke-width="${angular?1.2:.5}" opacity="${angular?1:.7}"/>`;
+    const na=rot(h.abs_degree+13);const[nx,ny]=pt(cx,cy,(RH+RHI)/2,na);
+    s+=`<text x="${nx}" y="${ny}" text-anchor="middle" dominant-baseline="central" font-size="7.5" fill="#3a3a58" font-family="serif">${h.number}</text>`;
+  });}
+
+  // aspect lines
+  if(data.aspects){data.aspects.slice(0,30).forEach(a=>{
+    const[ax1,ay1]=pt(cx,cy,RA,rot(a.p1_abs));
+    const[ax2,ay2]=pt(cx,cy,RA,rot(a.p2_abs));
+    s+=`<line x1="${ax1}" y1="${ay1}" x2="${ax2}" y2="${ay2}" stroke="${a.color||'#4a5168'}" stroke-width="0.6" opacity="0.3"/>`;
+  });}
+
+  // planets
+  const used=[];
+  function adj(ang){
+    let a=((ang%360)+360)%360;
+    for(const u of used){if(Math.abs(a-u)<9||Math.abs(a-u-360)<9||Math.abs(a-u+360)<9)a+=10;}
+    used.push(a);return a;
+  }
+  const mainPl=(data.planets||[]).filter(p=>!['Asc','MC'].includes(p.name));
+  mainPl.forEach(p=>{
+    const base=rot(p.abs_degree);
+    const final=adj(base);
+    const[px,py]=pt(cx,cy,RP,final);
+    // tick
+    const[t1x,t1y]=pt(cx,cy,RHI-1,base);const[t2x,t2y]=pt(cx,cy,RHI-9,base);
+    s+=`<line x1="${t1x}" y1="${t1y}" x2="${t2x}" y2="${t2y}" stroke="#c9a84c" stroke-width="0.7" opacity="0.45"/>`;
+    s+=`<circle cx="${px}" cy="${py}" r="12" fill="#0a0a14" stroke="#252538" stroke-width="0.8"/>`;
+    s+=`<text x="${px}" y="${py}" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#c9a84c">${p.symbol||p.name[0]}</text>`;
+    if(p.retrograde)s+=`<text x="${px+10}" y="${py-8}" font-size="6.5" fill="#7b6cff">℞</text>`;
+  });
+
+  // ASC line
+  const aa=rot(ascAbs);
+  const[ax1,ay1]=pt(cx,cy,RS+8,aa);const[ax2,ay2]=pt(cx,cy,RHI,aa);
+  s+=`<line x1="${ax1}" y1="${ay1}" x2="${ax2}" y2="${ay2}" stroke="#c9a84c" stroke-width="1.8" opacity="0.9"/>`;
+  const[alx,aly]=pt(cx,cy,RS+18,aa);
+  s+=`<text x="${alx}" y="${aly}" text-anchor="middle" dominant-baseline="central" font-size="8.5" fill="#c9a84c" font-weight="bold">AC</text>`;
+
+  // center
+  const nm=data.name?data.name.split(' ')[0].toUpperCase():'';
+  s+=`<text x="${cx}" y="${cy-7}" text-anchor="middle" font-size="10" fill="#c9a84c" letter-spacing="2">${nm}</text>`;
+  s+=`<text x="${cx}" y="${cy+7}" text-anchor="middle" font-size="8.5" fill="#3a3a58">${data.sun_symbol||''} ${data.sun_sign||''}</text>`;
+  s+=`</svg>`;
+  return s;
+}
+
+// ── RENDER ───────────────────────────────────────────────────────────
+function renderChart(d){
+  const planetRows=(d.planets||[]).filter(p=>!['Asc','MC'].includes(p.name)).map(p=>{
+    const ec=p.element?`elem-${p.element.toLowerCase()}`:'';
+    const deg=Math.floor(p.degree);const min=Math.round((p.degree%1)*60);
+    return`<div class="planet-row">
+      <span class="p-sym">${p.symbol||p.name[0]}</span>
+      <span class="p-name">${p.name}${p.retrograde?` <span class="retro">℞</span>`:''}</span>
+      <span class="p-sign ${ec}">${p.sign_symbol||''} ${p.sign}</span>
+      <span class="p-deg">${deg}°${min}'</span>
+      <span class="p-house">${p.house||''}</span>
+    </div>`;
+  }).join('');
+
+  const specialRows=(d.planets||[]).filter(p=>['Asc','MC'].includes(p.name)).map(p=>{
+    const deg=Math.floor(p.degree);const min=Math.round((p.degree%1)*60);
+    return`<div class="planet-row" style="opacity:.7">
+      <span class="p-sym" style="font-size:.7rem;color:#8a6e30">${p.symbol}</span>
+      <span class="p-name" style="color:#8a6e30">${p.name}</span>
+      <span class="p-sign">${p.sign_symbol||''} ${p.sign}</span>
+      <span class="p-deg">${deg}°${min}'</span>
+      <span></span>
+    </div>`;
+  }).join('');
+
+  const aspRows=(d.aspects||[]).slice(0,24).map(a=>`
+    <div class="asp-row">
+      <span class="asp-planets">${a.planet1_symbol} ${a.planet1} — ${a.planet2_symbol} ${a.planet2}</span>
+      <span class="asp-badge asp-${a.aspect}">${a.aspect_symbol} ${a.aspect} ${a.orb}°</span>
+    </div>`).join('');
+
+  const houseItems=(d.houses||[]).map(h=>`
+    <div class="house-item">
+      <div class="h-num">${h.number}</div>
+      <div class="h-sign">${h.sign_symbol} ${h.sign}</div>
+      <div class="h-deg">${h.degree}°</div>
+    </div>`).join('');
+
+  document.getElementById('chart-result').innerHTML=`
+  <div class="result-card">
+    <div class="big3">
+      <div class="big3-item"><div class="big3-label">Sun Sign</div><span class="big3-symbol">${d.sun_symbol||SIGN_SYMBOLS[d.sun_sign]||'☀️'}</span><div class="big3-sign">${d.sun_sign}</div></div>
+      <div class="big3-item"><div class="big3-label">Moon Sign</div><span class="big3-symbol">${d.moon_symbol||SIGN_SYMBOLS[d.moon_sign]||'🌙'}</span><div class="big3-sign">${d.moon_sign}</div></div>
+      <div class="big3-item"><div class="big3-label">Ascendant</div><span class="big3-symbol">${d.asc_symbol||SIGN_SYMBOLS[d.ascendant]||'⬆'}</span><div class="big3-sign">${d.ascendant}</div></div>
+    </div>
+    <div class="chart-layout">
+      <div class="wheel-box">
+        <div class="section-title">◈ Natal Chart Wheel</div>
+        ${buildWheel(d)}
+      </div>
+      <div class="planets-box">
+        <div class="section-title">◈ Planetary Positions</div>
+        ${planetRows}
+        ${specialRows?`<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--rim)">${specialRows}</div>`:''}
+      </div>
+    </div>
+    <div class="aspects-section">
+      <div class="section-title">◈ Aspects · ${(d.aspects||[]).length} found</div>
+      <div class="aspects-grid">${aspRows||'<p style="color:var(--text-dim);font-size:.8rem">No major aspects computed.</p>'}</div>
+    </div>
+    <div class="houses-section">
+      <div class="section-title">◈ House Cusps</div>
+      <div class="houses-grid">${houseItems}</div>
+    </div>
+    <div class="divider">today's reading</div>
+    <p class="horoscope-text">${d.horoscope}</p>
+  </div>`;
+}
+
+async function getChart(){
+  const data=parseBirth('c-');
+  if(!data||!data.name||!data.city){document.getElementById('chart-result').innerHTML='<div class="error">Please fill in name, date, and city.</div>';return;}
+  document.getElementById('chart-result').innerHTML='<div class="loading">Reading the heavens</div>';
+  try{
+    const res=await fetch('/api/chart',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    const d=await res.json();
+    if(!res.ok)throw new Error(d.detail);
     renderChart(d);
-  } catch(e) {
-    document.getElementById('chart-result').innerHTML = `<div class="error">Error: ${e.message}</div>`;
-  }
+  }catch(e){document.getElementById('chart-result').innerHTML=`<div class="error">Error: ${e.message}</div>`;}
 }
 
-function renderChart(d) {
-  const planets = d.planets.map(p => `
-    <div class="planet-row">
-      <span class="planet-name">${p.name}</span>
-      <span class="planet-sign">${SIGN_SYMBOLS[p.sign] || ''} ${p.sign}</span>
-      <span class="planet-deg">${p.degree}°</span>
-      ${p.retrograde ? '<span class="retro">℞ retro</span>' : '<span></span>'}
-    </div>
-  `).join('');
-
-  document.getElementById('chart-result').innerHTML = `
-    <div class="result-card">
-      <div class="big3">
-        <div class="big3-item">
-          <div class="big3-label">Sun Sign</div>
-          <span class="big3-symbol">${SIGN_SYMBOLS[d.sun_sign] || '☀️'}</span>
-          <div class="big3-sign">${d.sun_sign}</div>
-        </div>
-        <div class="big3-item">
-          <div class="big3-label">Moon Sign</div>
-          <span class="big3-symbol">${SIGN_SYMBOLS[d.moon_sign] || '🌙'}</span>
-          <div class="big3-sign">${d.moon_sign}</div>
-        </div>
-        <div class="big3-item">
-          <div class="big3-label">Ascendant</div>
-          <span class="big3-symbol">${SIGN_SYMBOLS[d.ascendant] || '⬆'}</span>
-          <div class="big3-sign">${d.ascendant}</div>
-        </div>
-      </div>
-
-      <div class="section-title">◈ Planetary Positions</div>
-      ${planets}
-
-      <div class="divider">today's reading</div>
-      <p class="horoscope-text">${d.horoscope}</p>
-    </div>
-  `;
-}
-
-async function getCompatibility() {
-  const p1 = parseBirth('p1-');
-  const p2 = parseBirth('p2-');
-  if (!p1.name || !p1.year || !p2.name || !p2.year) {
-    document.getElementById('compat-result').innerHTML = '<div class="error">Please fill in both people\'s details.</div>';
-    return;
-  }
-  document.getElementById('compat-result').innerHTML = '<div class="loading">Weaving the threads of fate</div>';
-  try {
-    const res = await fetch(API + '/api/compatibility', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({person1: p1, person2: p2}),
-    });
-    const d = await res.json();
-    if (!res.ok) throw new Error(d.detail);
-    renderCompat(d);
-  } catch(e) {
-    document.getElementById('compat-result').innerHTML = `<div class="error">Error: ${e.message}</div>`;
-  }
-}
-
-function renderCompat(d) {
-  const aspects = d.aspects.map(a => `
-    <div class="aspect-row">
-      <span>${d.person1}'s ${a.planet1} — ${d.person2}'s ${a.planet2}</span>
-      <span class="aspect-type ${a.aspect}">${a.aspect}</span>
-    </div>
-  `).join('');
-
-  document.getElementById('compat-result').innerHTML = `
-    <div class="result-card" style="margin-top:32px">
-      <div class="score-ring">
-        <div class="score-number">${d.score}</div>
-        <div class="score-label">Cosmic Compatibility Score</div>
-      </div>
-      <div class="score-bar">
-        <div class="score-fill" style="width:${d.score}%"></div>
-      </div>
-
+async function getCompatibility(){
+  const p1=parseBirth('p1-');const p2=parseBirth('p2-');
+  if(!p1||!p2||!p1.name||!p2.name){document.getElementById('compat-result').innerHTML='<div class="error">Please fill in both people\'s details.</div>';return;}
+  document.getElementById('compat-result').innerHTML='<div class="loading">Weaving the threads of fate</div>';
+  try{
+    const res=await fetch('/api/compatibility',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({person1:p1,person2:p2})});
+    const d=await res.json();
+    if(!res.ok)throw new Error(d.detail);
+    const asps=d.aspects.map(a=>`<div class="asp-row"><span class="asp-planets">${p1.name}'s ${a.planet1} — ${p2.name}'s ${a.planet2}</span><span class="asp-badge asp-${a.aspect}">${a.aspect} ${a.orb}°</span></div>`).join('');
+    document.getElementById('compat-result').innerHTML=`
+    <div class="result-card" style="margin-top:24px">
+      <div class="score-ring"><div class="score-num">${d.score}</div><div class="score-lbl">Cosmic Compatibility Score</div></div>
+      <div class="score-bar"><div class="score-fill" style="width:${d.score}%"></div></div>
       <p class="compat-summary">${d.summary}</p>
-
-      <div class="section-title">◈ Key Aspects</div>
-      <div class="aspects-grid">${aspects}</div>
-    </div>
-  `;
+      <div class="section-title" style="margin-top:16px">◈ Synastry Aspects</div>
+      <div class="aspects-grid">${asps}</div>
+    </div>`;
+  }catch(e){document.getElementById('compat-result').innerHTML=`<div class="error">Error: ${e.message}</div>`;}
 }
 
-async function getHoroscope(sign, btn) {
-  document.querySelectorAll('.sign-btn').forEach(b => b.classList.remove('active'));
+async function getHoroscope(sign,btn){
+  document.querySelectorAll('.sign-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('horoscope-result').innerHTML = '<div class="loading">Consulting the stars</div>';
-  try {
-    const res = await fetch(API + `/api/horoscope/${sign}`);
-    const d = await res.json();
-    document.getElementById('horoscope-result').innerHTML = `
-      <div class="horoscope-result">
-        <div class="horoscope-sign-title">${SIGN_SYMBOLS[sign] || ''} ${d.sign}</div>
-        <div class="horoscope-date">${d.date}</div>
-        <p class="horoscope-body">${d.horoscope}</p>
-      </div>
-    `;
-  } catch(e) {
-    document.getElementById('horoscope-result').innerHTML = `<div class="error">Error: ${e.message}</div>`;
-  }
+  document.getElementById('horoscope-result').innerHTML='<div class="loading">Consulting the stars</div>';
+  try{
+    const res=await fetch(`/api/horoscope/${sign}`);
+    const d=await res.json();
+    document.getElementById('horoscope-result').innerHTML=`
+    <div class="horo-result">
+      <div class="horo-title">${SIGN_SYMBOLS[sign]||''} ${d.sign}</div>
+      <div class="horo-date">${d.date}</div>
+      <p class="horo-body">${d.horoscope}</p>
+    </div>`;
+  }catch(e){document.getElementById('horoscope-result').innerHTML=`<div class="error">Error: ${e.message}</div>`;}
 }
 </script>
 </body>
