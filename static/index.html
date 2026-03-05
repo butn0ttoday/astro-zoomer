@@ -123,6 +123,8 @@ footer{text-align:center;padding:50px 0 36px;color:var(--text-dim);font-size:.64
     <button class="lang-btn active" onclick="setLang('en',this)">EN</button>
     <button class="lang-btn" onclick="setLang('ru',this)">RU</button>
     <button class="lang-btn" onclick="setLang('pl',this)">PL</button>
+    <button class="lang-btn" onclick="setLang('it',this)">IT</button>
+    <button class="lang-btn" onclick="setLang('de',this)">DE</button>
   </div>
   <div class="container">
   <header>
@@ -219,10 +221,13 @@ footer{text-align:center;padding:50px 0 36px;color:var(--text-dim);font-size:.64
 </div>
 
 <script>
+<script>
 const SIGN_SYMBOLS={'Aries':'♈︎','Taurus':'♉︎','Gemini':'♊︎','Cancer':'♋︎','Leo':'♌︎','Virgo':'♍︎','Libra':'♎︎','Scorpio':'♏︎','Sagittarius':'♐︎','Capricorn':'♑︎','Aquarius':'♒︎','Pisces':'♓︎'};
 const SIGN_SYMS=['♈︎','♉︎','♊︎','♋︎','♌︎','♍︎','♎︎','♏︎','♐︎','♑︎','♒︎','♓︎'];
 const SIGN_ELEM=['Fire','Earth','Air','Water','Fire','Earth','Air','Water','Fire','Earth','Air','Water'];
 const ELEM_COLORS={Fire:'#e8906a',Earth:'#8ab56a',Air:'#6ab5d4',Water:'#7b6cff'};
+const SIGN_ASTRO={'Aries':'♈︎','Taurus':'♉︎','Gemini':'♊︎','Cancer':'♋︎','Leo':'♌︎','Virgo':'♍︎','Libra':'♎︎','Scorpio':'♏︎','Sagittarius':'♐︎','Capricorn':'♑︎','Aquarius':'♒︎','Pisces':'♓︎'};
+const HOUSE_MAP={'First_House':'I','Second_House':'II','Third_House':'III','Fourth_House':'IV','Fifth_House':'V','Sixth_House':'VI','Seventh_House':'VII','Eighth_House':'VIII','Ninth_House':'IX','Tenth_House':'X','Eleventh_House':'XI','Twelfth_House':'XII','I':'I','II':'II','III':'III','IV':'IV','V':'V','VI':'VI','VII':'VII','VIII':'VIII','IX':'IX','X':'X','XI':'XI','XII':'XII'};
 
 function switchTab(n,el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));el.classList.add('active');document.getElementById('panel-'+n).classList.add('active')}
 
@@ -235,7 +240,7 @@ function parseBirth(pfx){
   return{name:document.getElementById(pfx+'name').value,year:y,month:mo,day:d,hour:h,minute:mi,city:document.getElementById(pfx+'city').value,nation:(document.getElementById(pfx+'nation').value||'US').toUpperCase()};
 }
 
-// ── THEME ─────────────────────────────────────────────────────────────
+// ── THEME ────────────────────────────────────────────────────────────
 let isDay=false;
 function toggleTheme(){
   isDay=!isDay;
@@ -247,26 +252,27 @@ function toggleTheme(){
 const LANGS={
   en:{
     tagline:"where starlight meets your soul",
-    tab_chart:"Birth Chart", tab_compat:"Compatibility", tab_horo:"Horoscope",
+    tab_chart:"Birth Chart",tab_compat:"Compatibility",tab_horo:"Horoscope",
     chart_title:"◈ Cast Your Natal Chart",
-    label_name:"Full Name", label_dob:"Date of Birth", label_tob:"Time of Birth",
-    label_city:"City", label_country:"Country Code (2 letters)",
-    ph_name:"Your name", ph_city:"e.g. London", ph_country:"e.g. GB",
+    label_name:"Full Name",label_dob:"Date of Birth",label_tob:"Time of Birth",
+    label_city:"City",label_country:"Country Code (2 letters)",
+    ph_name:"Your name",ph_city:"e.g. London",ph_country:"e.g. GB",
     btn_chart:"Reveal Chart",
-    compat_soul1:"◈ First Soul", compat_soul2:"◈ Second Soul",
-    divider_and:"and",
-    btn_compat:"Read the Stars",
+    compat_soul1:"◈ First Soul",compat_soul2:"◈ Second Soul",
+    divider_and:"and",btn_compat:"Read the Stars",
     footer:"lumina · where starlight meets your soul",
     footer_credit:"Designed & developed by Lina Lonskaya, 2026",
     footer_disclaimer:"LUMINA is an independent, non-commercial project created for educational and personal exploration purposes. No monetisation is intended or pursued.",
-    loading_chart:"Reading the heavens", loading_compat:"Weaving the threads of fate", loading_horo:"Consulting the stars",
-    err_fill_chart:"Please fill in name, date, and city.",
-    err_fill_compat:"Please fill in both people's details.",
-    lbl_sun:"Sun Sign", lbl_moon:"Moon Sign", lbl_asc:"Ascendant",
-    sec_wheel:"◈ Natal Chart Wheel", sec_planets:"◈ Planetary Positions",
-    sec_aspects:"◈ Aspects", sec_houses:"◈ House Cusps",
-    sec_today:"today's reading", sec_score:"Cosmic Compatibility Score",
-    sec_synastry:"◈ Synastry Aspects",
+    loading_chart:"Reading the heavens",loading_compat:"Weaving the threads of fate",loading_horo:"Consulting the stars",
+    err_fill_chart:"Please fill in name, date, and city.",err_fill_compat:"Please fill in both people's details.",
+    lbl_sun:"Sun Sign",lbl_moon:"Moon Sign",lbl_asc:"Ascendant",
+    sec_wheel:"◈ Natal Chart Wheel",sec_planets:"◈ Planetary Positions",
+    sec_aspects:"◈ Aspects",sec_houses:"◈ House Cusps",
+    sec_today:"today's reading",sec_score:"Cosmic Compatibility Score",sec_synastry:"◈ Synastry Aspects",
+    planets:{Sun:"Sun",Moon:"Moon",Mercury:"Mercury",Venus:"Venus",Mars:"Mars",Jupiter:"Jupiter",Saturn:"Saturn",Uranus:"Uranus",Neptune:"Neptune",Pluto:"Pluto",Mean_Node:"North Node",Chiron:"Chiron",Asc:"Asc",MC:"MC"},
+    signs:{Aries:"Aries",Taurus:"Taurus",Gemini:"Gemini",Cancer:"Cancer",Leo:"Leo",Virgo:"Virgo",Libra:"Libra",Scorpio:"Scorpio",Sagittarius:"Sagittarius",Capricorn:"Capricorn",Aquarius:"Aquarius",Pisces:"Pisces"},
+    elements:{Fire:"Fire",Earth:"Earth",Air:"Air",Water:"Water"},
+    aspects:{conjunction:"conjunction",opposition:"opposition",trine:"trine",square:"square",sextile:"sextile",quincunx:"quincunx"},
     horoscopes:{
       Aries:"The ram charges forward today. Mars fuels your ambition — act on instinct, but temper impulsiveness with awareness.",
       Taurus:"Venus wraps you in earthly pleasures. Financial matters deserve attention. Trust your body's wisdom today.",
@@ -284,26 +290,27 @@ const LANGS={
   },
   ru:{
     tagline:"где звёздный свет встречает твою душу",
-    tab_chart:"Натальная карта", tab_compat:"Совместимость", tab_horo:"Гороскоп",
+    tab_chart:"Натальная карта",tab_compat:"Совместимость",tab_horo:"Гороскоп",
     chart_title:"◈ Построить натальную карту",
-    label_name:"Полное имя", label_dob:"Дата рождения", label_tob:"Время рождения",
-    label_city:"Город", label_country:"Код страны (2 буквы)",
-    ph_name:"Ваше имя", ph_city:"напр. Москва", ph_country:"напр. RU",
+    label_name:"Полное имя",label_dob:"Дата рождения",label_tob:"Время рождения",
+    label_city:"Город",label_country:"Код страны (2 буквы)",
+    ph_name:"Ваше имя",ph_city:"напр. Москва",ph_country:"напр. RU",
     btn_chart:"Открыть карту",
-    compat_soul1:"◈ Первая душа", compat_soul2:"◈ Вторая душа",
-    divider_and:"и",
-    btn_compat:"Читать звёзды",
+    compat_soul1:"◈ Первая душа",compat_soul2:"◈ Вторая душа",
+    divider_and:"и",btn_compat:"Читать звёзды",
     footer:"lumina · где звёздный свет встречает твою душу",
     footer_credit:"Дизайн и разработка — Лина Лонская, 2026",
     footer_disclaimer:"LUMINA — независимый некоммерческий проект, созданный в образовательных и личных исследовательских целях. Монетизация не предусмотрена и не преследуется.",
-    loading_chart:"Читаем небеса", loading_compat:"Плетём нити судьбы", loading_horo:"Консультируемся со звёздами",
-    err_fill_chart:"Пожалуйста, заполните имя, дату и город.",
-    err_fill_compat:"Пожалуйста, заполните данные обоих людей.",
-    lbl_sun:"Знак Солнца", lbl_moon:"Знак Луны", lbl_asc:"Асцендент",
-    sec_wheel:"◈ Колесо натальной карты", sec_planets:"◈ Положение планет",
-    sec_aspects:"◈ Аспекты", sec_houses:"◈ Куспиды домов",
-    sec_today:"чтение на сегодня", sec_score:"Оценка космической совместимости",
-    sec_synastry:"◈ Синастрические аспекты",
+    loading_chart:"Читаем небеса",loading_compat:"Плетём нити судьбы",loading_horo:"Консультируемся со звёздами",
+    err_fill_chart:"Пожалуйста, заполните имя, дату и город.",err_fill_compat:"Пожалуйста, заполните данные обоих людей.",
+    lbl_sun:"Знак Солнца",lbl_moon:"Знак Луны",lbl_asc:"Асцендент",
+    sec_wheel:"◈ Колесо натальной карты",sec_planets:"◈ Положение планет",
+    sec_aspects:"◈ Аспекты",sec_houses:"◈ Куспиды домов",
+    sec_today:"чтение на сегодня",sec_score:"Оценка космической совместимости",sec_synastry:"◈ Синастрические аспекты",
+    planets:{Sun:"Солнце",Moon:"Луна",Mercury:"Меркурий",Venus:"Венера",Mars:"Марс",Jupiter:"Юпитер",Saturn:"Сатурн",Uranus:"Уран",Neptune:"Нептун",Pluto:"Плутон",Mean_Node:"Сев. Узел",Chiron:"Хирон",Asc:"Асц.",MC:"МС"},
+    signs:{Aries:"Овен",Taurus:"Телец",Gemini:"Близнецы",Cancer:"Рак",Leo:"Лев",Virgo:"Дева",Libra:"Весы",Scorpio:"Скорпион",Sagittarius:"Стрелец",Capricorn:"Козерог",Aquarius:"Водолей",Pisces:"Рыбы"},
+    elements:{Fire:"Огонь",Earth:"Земля",Air:"Воздух",Water:"Вода"},
+    aspects:{conjunction:"соединение",opposition:"оппозиция",trine:"трин",square:"квадрат",sextile:"секстиль",quincunx:"квинконс"},
     horoscopes:{
       Aries:"Овен уверенно движется вперёд. Марс питает ваши амбиции — действуйте интуитивно, но сдерживайте импульсивность.",
       Taurus:"Венера окутывает вас земными удовольствиями. Финансовые дела требуют внимания. Доверяйте мудрости тела.",
@@ -319,28 +326,104 @@ const LANGS={
       Pisces:"Нептун растворяет границы между мирами. Интуиция говорит громче логики. Сны несут послания, достойные расшифровки.",
     }
   },
-  pl:{
+  it:{
+    tagline:"dove la luce delle stelle incontra la tua anima",
+    tab_chart:"Tema Natale",tab_compat:"Compatibilità",tab_horo:"Oroscopo",
+    chart_title:"◈ Calcola il tuo tema natale",
+    label_name:"Nome completo",label_dob:"Data di nascita",label_tob:"Ora di nascita",
+    label_city:"Città",label_country:"Codice paese (2 lettere)",
+    ph_name:"Il tuo nome",ph_city:"es. Roma",ph_country:"es. IT",
+    btn_chart:"Rivela il tema",
+    compat_soul1:"◈ Prima anima",compat_soul2:"◈ Seconda anima",
+    divider_and:"e",btn_compat:"Leggi le stelle",
+    footer:"lumina · dove la luce delle stelle incontra la tua anima",
+    footer_credit:"Progettato e sviluppato da Lina Lonskaya, 2026",
+    footer_disclaimer:"LUMINA è un progetto indipendente e non commerciale, creato a scopo educativo e di esplorazione personale. Non è prevista né perseguita alcuna monetizzazione.",
+    loading_chart:"Leggiamo i cieli",loading_compat:"Intrecciamo i fili del destino",loading_horo:"Consultiamo le stelle",
+    err_fill_chart:"Inserisci nome, data e città.",err_fill_compat:"Inserisci i dati di entrambe le persone.",
+    lbl_sun:"Segno Solare",lbl_moon:"Segno Lunare",lbl_asc:"Ascendente",
+    sec_wheel:"◈ Ruota del tema natale",sec_planets:"◈ Posizioni planetarie",
+    sec_aspects:"◈ Aspetti",sec_houses:"◈ Cuspidi delle case",
+    sec_today:"lettura del giorno",sec_score:"Punteggio di compatibilità cosmica",sec_synastry:"◈ Aspetti di sinastria",
+    planets:{Sun:"Sole",Moon:"Luna",Mercury:"Mercurio",Venus:"Venere",Mars:"Marte",Jupiter:"Giove",Saturn:"Saturno",Uranus:"Urano",Neptune:"Nettuno",Pluto:"Plutone",Mean_Node:"Nodo Nord",Chiron:"Chirone",Asc:"Asc",MC:"MC"},
+    signs:{Aries:"Ariete",Taurus:"Toro",Gemini:"Gemelli",Cancer:"Cancro",Leo:"Leone",Virgo:"Vergine",Libra:"Bilancia",Scorpio:"Scorpione",Sagittarius:"Sagittario",Capricorn:"Capricorno",Aquarius:"Acquario",Pisces:"Pesci"},
+    elements:{Fire:"Fuoco",Earth:"Terra",Air:"Aria",Water:"Acqua"},
+    aspects:{conjunction:"congiunzione",opposition:"opposizione",trine:"trigono",square:"quadratura",sextile:"sestile",quincunx:"quinconce"},
+    horoscopes:{
+      Aries:"L'ariete avanza con decisione. Marte alimenta le tue ambizioni — agisci d'istinto, ma frena l'impulsività con consapevolezza.",
+      Taurus:"Venere ti avvolge nei piaceri terreni. Le questioni finanziarie meritano attenzione. Fidati della saggezza del tuo corpo.",
+      Gemini:"Mercurio danza tra le idee. Le tue parole hanno oggi un potere insolito — usale con saggezza. Una conversazione cambia qualcosa.",
+      Cancer:"La Luna parla alle profondità della tua anima. Le maree emotive sono alte. Casa e famiglia offrono conforto e chiarezza.",
+      Leo:"Il Sole illumina il tuo trono naturale. La tua presenza domina ogni stanza senza sforzo. Condividi generosamente il tuo calore.",
+      Virgo:"I dettagli rivelano verità nascoste. La tua mente analitica taglia attraverso le illusioni. Il servizio agli altri porta una ricompensa inattesa.",
+      Libra:"La bilancia cerca equilibrio. Una scelta che hai evitato esige una risoluzione. La bellezza e l'armonia restaurano il tuo senso di sé.",
+      Scorpio:"Le profondità ti chiamano. La trasformazione ribolle sotto la superficie. Ciò che rilasci oggi crea spazio per la rinascita.",
+      Sagittarius:"L'arciere tende l'arco per un tiro lontano. Filosofia e avventura fanno cenno. La verità arriva da una direzione inaspettata.",
+      Capricorn:"Saturno premia lo sforzo paziente. Le tue ambizioni sono ben fondate — fidati della salita lenta. L'autorità riconosce il tuo valore.",
+      Aquarius:"Urano scatena soluzioni non convenzionali. La tua visione è in anticipo sui tempi. Trova altri che possano vedere ciò che vedi tu.",
+      Pisces:"Nettuno dissolve i confini tra i mondi. L'intuizione parla più forte della logica oggi. I sogni portano messaggi che vale la pena decifrare.",
+    }
+  },
+  de:{
+    tagline:"wo Sternenlicht auf deine Seele trifft",
+    tab_chart:"Geburtshoroskop",tab_compat:"Kompatibilität",tab_horo:"Horoskop",
+    chart_title:"◈ Dein Geburtshoroskop erstellen",
+    label_name:"Vollständiger Name",label_dob:"Geburtsdatum",label_tob:"Geburtszeit",
+    label_city:"Stadt",label_country:"Ländercode (2 Buchstaben)",
+    ph_name:"Dein Name",ph_city:"z.B. Berlin",ph_country:"z.B. DE",
+    btn_chart:"Horoskop enthüllen",
+    compat_soul1:"◈ Erste Seele",compat_soul2:"◈ Zweite Seele",
+    divider_and:"und",btn_compat:"Die Sterne lesen",
+    footer:"lumina · wo Sternenlicht auf deine Seele trifft",
+    footer_credit:"Gestaltet und entwickelt von Lina Lonskaya, 2026",
+    footer_disclaimer:"LUMINA ist ein unabhängiges, nicht-kommerzielles Projekt, das zu Bildungs- und persönlichen Erkundungszwecken erstellt wurde. Eine Monetarisierung ist weder beabsichtigt noch angestrebt.",
+    loading_chart:"Wir lesen die Himmel",loading_compat:"Wir weben die Fäden des Schicksals",loading_horo:"Wir befragen die Sterne",
+    err_fill_chart:"Bitte Name, Datum und Stadt eingeben.",err_fill_compat:"Bitte die Daten beider Personen eingeben.",
+    lbl_sun:"Sonnenzeichen",lbl_moon:"Mondzeichen",lbl_asc:"Aszendent",
+    sec_wheel:"◈ Horoskoprad",sec_planets:"◈ Planetenpositionen",
+    sec_aspects:"◈ Aspekte",sec_houses:"◈ Hauskuspide",
+    sec_today:"heutige Lesung",sec_score:"Kosmischer Kompatibilitätswert",sec_synastry:"◈ Synastrie-Aspekte",
+    planets:{Sun:"Sonne",Moon:"Mond",Mercury:"Merkur",Venus:"Venus",Mars:"Mars",Jupiter:"Jupiter",Saturn:"Saturn",Uranus:"Uranus",Neptune:"Neptun",Pluto:"Pluto",Mean_Node:"Nordknoten",Chiron:"Chiron",Asc:"Asc",MC:"MC"},
+    signs:{Aries:"Widder",Taurus:"Stier",Gemini:"Zwillinge",Cancer:"Krebs",Leo:"Löwe",Virgo:"Jungfrau",Libra:"Waage",Scorpio:"Skorpion",Sagittarius:"Schütze",Capricorn:"Steinbock",Aquarius:"Wassermann",Pisces:"Fische"},
+    elements:{Fire:"Feuer",Earth:"Erde",Air:"Luft",Water:"Wasser"},
+    aspects:{conjunction:"Konjunktion",opposition:"Opposition",trine:"Trigon",square:"Quadrat",sextile:"Sextil",quincunx:"Quincunx"},
+    horoscopes:{
+      Aries:"Der Widder prescht voran. Mars befeuert deinen Ehrgeiz — handle instinktiv, aber zähme die Impulsivität mit Bewusstsein.",
+      Taurus:"Venus hüllt dich in irdische Freuden. Finanzielle Angelegenheiten verdienen Aufmerksamkeit. Vertraue der Weisheit deines Körpers.",
+      Gemini:"Merkur tanzt zwischen Ideen. Deine Worte tragen heute ungewöhnliche Kraft — nutze sie weise. Ein Gespräch verändert etwas.",
+      Cancer:"Der Mond spricht zu deinen Tiefen. Emotionale Gezeiten sind hoch. Heim und Familie bieten Trost und Klarheit.",
+      Leo:"Die Sonne erleuchtet deinen natürlichen Thron. Deine Präsenz beherrscht Räume mühelos. Teile deine Wärme großzügig.",
+      Virgo:"Details enthüllen verborgene Wahrheiten. Dein analytischer Verstand durchdringt Illusionen. Der Dienst an anderen bringt unerwartete Belohnung.",
+      Libra:"Die Waage sucht Gleichgewicht. Eine Entscheidung, der du ausgewichen bist, verlangt eine Lösung. Schönheit und Harmonie stellen dein Selbstgefühl wieder her.",
+      Scorpio:"Die Tiefen rufen dich. Transformation brodelt unter der Oberfläche. Was du heute loslässt, schafft Raum für Wiedergeburt.",
+      Sagittarius:"Der Bogenschütze spannt für einen weiten Schuss. Philosophie und Abenteuer winken. Die Wahrheit kommt aus einer unerwarteten Richtung.",
+      Capricorn:"Saturn belohnt geduldige Mühe. Deine Ambitionen sind wohlbegründet — vertraue dem langsamen Aufstieg. Autorität erkennt deinen Wert.",
+      Aquarius:"Uranus entfacht unkonventionelle Lösungen. Deine Vision ist ihrer Zeit voraus. Finde andere, die sehen können, was du siehst.",
+      Pisces:"Neptun löst die Grenzen zwischen den Welten auf. Intuition spricht heute lauter als Logik. Träume tragen Botschaften, die es wert sind, entschlüsselt zu werden.",
+    }
+  }
     tagline:"gdzie światło gwiazd spotyka twoją duszę",
-    tab_chart:"Karta Urodzenia", tab_compat:"Zgodność", tab_horo:"Horoskop",
+    tab_chart:"Karta Urodzenia",tab_compat:"Zgodność",tab_horo:"Horoskop",
     chart_title:"◈ Stwórz swoją kartę urodzenia",
-    label_name:"Imię i nazwisko", label_dob:"Data urodzenia", label_tob:"Godzina urodzenia",
-    label_city:"Miasto", label_country:"Kod kraju (2 litery)",
-    ph_name:"Twoje imię", ph_city:"np. Warszawa", ph_country:"np. PL",
+    label_name:"Imię i nazwisko",label_dob:"Data urodzenia",label_tob:"Godzina urodzenia",
+    label_city:"Miasto",label_country:"Kod kraju (2 litery)",
+    ph_name:"Twoje imię",ph_city:"np. Warszawa",ph_country:"np. PL",
     btn_chart:"Odkryj kartę",
-    compat_soul1:"◈ Pierwsza dusza", compat_soul2:"◈ Druga dusza",
-    divider_and:"i",
-    btn_compat:"Czytaj gwiazdy",
+    compat_soul1:"◈ Pierwsza dusza",compat_soul2:"◈ Druga dusza",
+    divider_and:"i",btn_compat:"Czytaj gwiazdy",
     footer:"lumina · gdzie światło gwiazd spotyka twoją duszę",
     footer_credit:"Projekt i realizacja — Lina Lonskaya, 2026",
     footer_disclaimer:"LUMINA to niezależny projekt niekomercyjny, stworzony w celach edukacyjnych i osobistego odkrywania. Nie jest i nie będzie źródłem dochodu.",
-    loading_chart:"Czytamy niebiosa", loading_compat:"Splatamy nici przeznaczenia", loading_horo:"Konsultujemy się z gwiazdami",
-    err_fill_chart:"Proszę wypełnić imię, datę i miasto.",
-    err_fill_compat:"Proszę wypełnić dane obu osób.",
-    lbl_sun:"Znak Słońca", lbl_moon:"Znak Księżyca", lbl_asc:"Ascendent",
-    sec_wheel:"◈ Koło karty urodzenia", sec_planets:"◈ Pozycje planet",
-    sec_aspects:"◈ Aspekty", sec_houses:"◈ Kuspy domów",
-    sec_today:"dzisiejsza przepowiednia", sec_score:"Kosmiczny wynik zgodności",
-    sec_synastry:"◈ Aspekty synastrii",
+    loading_chart:"Czytamy niebiosa",loading_compat:"Splatamy nici przeznaczenia",loading_horo:"Konsultujemy się z gwiazdami",
+    err_fill_chart:"Proszę wypełnić imię, datę i miasto.",err_fill_compat:"Proszę wypełnić dane obu osób.",
+    lbl_sun:"Znak Słońca",lbl_moon:"Znak Księżyca",lbl_asc:"Ascendent",
+    sec_wheel:"◈ Koło karty urodzenia",sec_planets:"◈ Pozycje planet",
+    sec_aspects:"◈ Aspekty",sec_houses:"◈ Kuspy domów",
+    sec_today:"dzisiejsza przepowiednia",sec_score:"Kosmiczny wynik zgodności",sec_synastry:"◈ Aspekty synastrii",
+    planets:{Sun:"Słońce",Moon:"Księżyc",Mercury:"Merkury",Venus:"Wenus",Mars:"Mars",Jupiter:"Jowisz",Saturn:"Saturn",Uranus:"Uran",Neptune:"Neptun",Pluto:"Pluton",Mean_Node:"Węzeł Płn.",Chiron:"Chiron",Asc:"Asc",MC:"MC"},
+    signs:{Aries:"Baran",Taurus:"Byk",Gemini:"Bliźnięta",Cancer:"Rak",Leo:"Lew",Virgo:"Panna",Libra:"Waga",Scorpio:"Skorpion",Sagittarius:"Strzelec",Capricorn:"Koziorożec",Aquarius:"Wodnik",Pisces:"Ryby"},
+    elements:{Fire:"Ogień",Earth:"Ziemia",Air:"Powietrze",Water:"Woda"},
+    aspects:{conjunction:"koniunkcja",opposition:"opozycja",trine:"trygon",square:"kwadrat",sextile:"sekstyl",quincunx:"kwinkunks"},
     horoscopes:{
       Aries:"Baran śmiało rusza naprzód. Mars zasila twoje ambicje — działaj instynktownie, lecz okiełznaj impulsywność.",
       Taurus:"Wenus otula cię ziemskimi przyjemnościami. Sprawy finansowe wymagają uwagi. Zaufaj mądrości swojego ciała.",
@@ -360,37 +443,37 @@ const LANGS={
 
 let currentLang='en';
 
-function setLang(lang, btn){
+function setLang(lang,btn){
   currentLang=lang;
   document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   const t=LANGS[lang];
-  // translate all data-i18n elements
   document.querySelectorAll('[data-i18n]').forEach(el=>{
     const key=el.getAttribute('data-i18n');
     if(t[key]!==undefined)el.textContent=t[key];
   });
-  // translate placeholders
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
     const key=el.getAttribute('data-i18n-placeholder');
     if(t[key]!==undefined)el.placeholder=t[key];
   });
 }
 
-function T(key){return LANGS[currentLang][key]||LANGS.en[key]||key;}
+function T(key){return(LANGS[currentLang]&&LANGS[currentLang][key])||LANGS.en[key]||key;}
+function TP(name){return(LANGS[currentLang].planets&&LANGS[currentLang].planets[name])||name;}
+function TS(sign){return(LANGS[currentLang].signs&&LANGS[currentLang].signs[sign])||sign;}
+function TE(elem){return(LANGS[currentLang].elements&&LANGS[currentLang].elements[elem])||elem;}
+function TA(asp){return(LANGS[currentLang].aspects&&LANGS[currentLang].aspects[asp])||asp;}
 function TH(sign){return(LANGS[currentLang].horoscopes&&LANGS[currentLang].horoscopes[sign])||LANGS.en.horoscopes[sign]||'';}
 
-function r2d(r){return r*180/Math.PI}
+// ── CHART WHEEL ──────────────────────────────────────────────────────
 function d2r(d){return d*Math.PI/180}
 function pt(cx,cy,r,deg){const a=d2r(deg-90);return[cx+r*Math.cos(a),cy+r*Math.sin(a)]}
-function arc(cx,cy,r,a1,a2,large){const[x1,y1]=pt(cx,cy,r,a1);const[x2,y2]=pt(cx,cy,r,a2);return`M${x1},${y1} A${r},${r} 0 ${large},1 ${x2},${y2}`}
 
 function buildWheel(data){
   const S=500,cx=250,cy=250;
   const RO=230,RS=208,RSI=186,RH=183,RHI=155,RP=128,RA=100,RI=48;
   const ascAbs=data.asc_abs||0;
   const rot=a=>a+180-ascAbs;
-
   const isDay=document.body.classList.contains('day');
   const wheelBg=isDay?'#ede7d9':'#08080f';
   const innerBg=isDay?'#e8e0ce':'#060610';
@@ -400,29 +483,25 @@ function buildWheel(data){
   let s=`<svg viewBox="0 0 ${S} ${S}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:420px">
   <circle cx="${cx}" cy="${cy}" r="${RO}" fill="${wheelBg}" stroke="${circleSt}" stroke-width="1.5"/>`;
 
-  // zodiac segments
   for(let i=0;i<12;i++){
     const a1=rot(i*30),a2=rot((i+1)*30);
     const[x1,y1]=pt(cx,cy,RS,a1);const[x2,y2]=pt(cx,cy,RSI,a1);
     const[x3,y3]=pt(cx,cy,RSI,a2);const[x4,y4]=pt(cx,cy,RS,a2);
     const ec=ELEM_COLORS[SIGN_ELEM[i]]+'1a';
-    s+=`<path d="M${x1},${y1} A${RS},${RS} 0 0,1 ${x4},${y4} L${x3},${y3} A${RSI},${RSI} 0 0,0 ${x2},${y2} Z" fill="${ec}" stroke="#1e1e30" stroke-width="0.5"/>`;
+    s+=`<path d="M${x1},${y1} A${RS},${RS} 0 0,1 ${x4},${y4} L${x3},${y3} A${RSI},${RSI} 0 0,0 ${x2},${y2} Z" fill="${ec}" stroke="${dimLine}" stroke-width="0.5"/>`;
     const ma=rot(i*30+15);
     const[sx,sy]=pt(cx,cy,(RS+RSI)/2,ma);
     s+=`<text x="${sx}" y="${sy}" text-anchor="middle" dominant-baseline="central" font-size="13" fill="${ELEM_COLORS[SIGN_ELEM[i]]}" opacity="0.85">${SIGN_SYMS[i]}</text>`;
-    // degree tick at 0°
     const[tx1,ty1]=pt(cx,cy,RS,a1);const[tx2,ty2]=pt(cx,cy,RSI+2,a1);
-    s+=`<line x1="${tx1}" y1="${ty1}" x2="${tx2}" y2="${ty2}" stroke="#2a2a40" stroke-width="0.6"/>`;
+    s+=`<line x1="${tx1}" y1="${ty1}" x2="${tx2}" y2="${ty2}" stroke="${dimLine}" stroke-width="0.6"/>`;
   }
 
-  // circles
   s+=`<circle cx="${cx}" cy="${cy}" r="${RS}" fill="none" stroke="${circleSt}" stroke-width="1"/>`;
   s+=`<circle cx="${cx}" cy="${cy}" r="${RSI}" fill="none" stroke="${dimLine}" stroke-width="0.6"/>`;
   s+=`<circle cx="${cx}" cy="${cy}" r="${RH}" fill="none" stroke="${dimLine}" stroke-width="0.4"/>`;
   s+=`<circle cx="${cx}" cy="${cy}" r="${RHI}" fill="none" stroke="${dimLine}" stroke-width="0.8"/>`;
   s+=`<circle cx="${cx}" cy="${cy}" r="${RI}" fill="${innerBg}" stroke="${dimLine}" stroke-width="1"/>`;
 
-  // house cusps
   if(data.houses){data.houses.forEach((h,i)=>{
     const ang=rot(h.abs_degree);
     const[hx1,hy1]=pt(cx,cy,RH,ang);const[hx2,hy2]=pt(cx,cy,RI+4,ang);
@@ -432,14 +511,12 @@ function buildWheel(data){
     s+=`<text x="${nx}" y="${ny}" text-anchor="middle" dominant-baseline="central" font-size="7.5" fill="${isDay?'#9a8e7a':'#3a3a58'}" font-family="serif">${h.number}</text>`;
   });}
 
-  // aspect lines
   if(data.aspects){data.aspects.slice(0,30).forEach(a=>{
     const[ax1,ay1]=pt(cx,cy,RA,rot(a.p1_abs));
     const[ax2,ay2]=pt(cx,cy,RA,rot(a.p2_abs));
     s+=`<line x1="${ax1}" y1="${ay1}" x2="${ax2}" y2="${ay2}" stroke="${a.color||'#4a5168'}" stroke-width="0.6" opacity="0.3"/>`;
   });}
 
-  // planets
   const used=[];
   function adj(ang){
     let a=((ang%360)+360)%360;
@@ -451,7 +528,6 @@ function buildWheel(data){
     const base=rot(p.abs_degree);
     const final=adj(base);
     const[px,py]=pt(cx,cy,RP,final);
-    // tick
     const[t1x,t1y]=pt(cx,cy,RHI-1,base);const[t2x,t2y]=pt(cx,cy,RHI-9,base);
     s+=`<line x1="${t1x}" y1="${t1y}" x2="${t2x}" y2="${t2y}" stroke="#c9a84c" stroke-width="0.7" opacity="0.45"/>`;
     s+=`<circle cx="${px}" cy="${py}" r="12" fill="${isDay?'#e8e0ce':'#0a0a14'}" stroke="${isDay?'#d4c9b0':'#252538'}" stroke-width="0.8"/>`;
@@ -459,35 +535,30 @@ function buildWheel(data){
     if(p.retrograde)s+=`<text x="${px+10}" y="${py-8}" font-size="6.5" fill="#7b6cff">℞</text>`;
   });
 
-  // ASC line
   const aa=rot(ascAbs);
   const[ax1,ay1]=pt(cx,cy,RS+8,aa);const[ax2,ay2]=pt(cx,cy,RHI,aa);
   s+=`<line x1="${ax1}" y1="${ay1}" x2="${ax2}" y2="${ay2}" stroke="#c9a84c" stroke-width="1.8" opacity="0.9"/>`;
   const[alx,aly]=pt(cx,cy,RS+18,aa);
   s+=`<text x="${alx}" y="${aly}" text-anchor="middle" dominant-baseline="central" font-size="8.5" fill="#c9a84c" font-weight="bold">AC</text>`;
 
-  // center
   const nm=data.name?data.name.split(' ')[0].toUpperCase():'';
   s+=`<text x="${cx}" y="${cy-7}" text-anchor="middle" font-size="10" fill="#c9a84c" letter-spacing="2">${nm}</text>`;
-  s+=`<text x="${cx}" y="${cy+7}" text-anchor="middle" font-size="8.5" fill="${isDay?'#9a8e7a':'#3a3a58'}">${data.sun_symbol||''} ${data.sun_sign||''}</text>`;
+  s+=`<text x="${cx}" y="${cy+7}" text-anchor="middle" font-size="8.5" fill="${isDay?'#9a8e7a':'#3a3a58'}">${SIGN_ASTRO[data.sun_sign]||''} ${data.sun_sign||''}</text>`;
   s+=`</svg>`;
   return s;
 }
 
 // ── RENDER ───────────────────────────────────────────────────────────
-const HOUSE_MAP={'First_House':'I','Second_House':'II','Third_House':'III','Fourth_House':'IV','Fifth_House':'V','Sixth_House':'VI','Seventh_House':'VII','Eighth_House':'VIII','Ninth_House':'IX','Tenth_House':'X','Eleventh_House':'XI','Twelfth_House':'XII','I':'I','II':'II','III':'III','IV':'IV','V':'V','VI':'VI','VII':'VII','VIII':'VIII','IX':'IX','X':'X','XI':'XI','XII':'XII'};
-const SIGN_ASTRO={'Aries':'♈︎','Taurus':'♉︎','Gemini':'♊︎','Cancer':'♋︎','Leo':'♌︎','Virgo':'♍︎','Libra':'♎︎','Scorpio':'♏︎','Sagittarius':'♐︎','Capricorn':'♑︎','Aquarius':'♒︎','Pisces':'♓︎'};
-
 function renderChart(d){
   const planetRows=(d.planets||[]).filter(p=>!['Asc','MC'].includes(p.name)).map(p=>{
     const ec=p.element?`elem-${p.element.toLowerCase()}`:'';
     const deg=Math.floor(p.degree);const min=Math.round((p.degree%1)*60);
     const houseNum=HOUSE_MAP[p.house]||p.house||'';
-    const signSym=SIGN_ASTRO[p.sign]||p.sign_symbol||'';
+    const signSym=SIGN_ASTRO[p.sign]||'';
     return`<div class="planet-row">
       <span class="p-sym">${p.symbol||p.name[0]}</span>
-      <span class="p-name">${p.name}${p.retrograde?` <span class="retro">℞</span>`:''}</span>
-      <span class="p-sign ${ec}">${signSym} ${p.sign}</span>
+      <span class="p-name">${TP(p.name)}${p.retrograde?` <span class="retro">℞</span>`:''}</span>
+      <span class="p-sign ${ec}">${signSym} ${TS(p.sign)}</span>
       <span class="p-deg">${deg}°${min}'</span>
       <span class="p-house">${houseNum}</span>
     </div>`;
@@ -495,11 +566,11 @@ function renderChart(d){
 
   const specialRows=(d.planets||[]).filter(p=>['Asc','MC'].includes(p.name)).map(p=>{
     const deg=Math.floor(p.degree);const min=Math.round((p.degree%1)*60);
-    const signSym=SIGN_ASTRO[p.sign]||p.sign_symbol||'';
+    const signSym=SIGN_ASTRO[p.sign]||'';
     return`<div class="planet-row" style="opacity:.7">
       <span class="p-sym" style="font-size:.7rem;color:#8a6e30">${p.symbol}</span>
-      <span class="p-name" style="color:#8a6e30">${p.name}</span>
-      <span class="p-sign">${signSym} ${p.sign}</span>
+      <span class="p-name" style="color:#8a6e30">${TP(p.name)}</span>
+      <span class="p-sign">${signSym} ${TS(p.sign)}</span>
       <span class="p-deg">${deg}°${min}'</span>
       <span></span>
     </div>`;
@@ -507,23 +578,23 @@ function renderChart(d){
 
   const aspRows=(d.aspects||[]).slice(0,24).map(a=>`
     <div class="asp-row">
-      <span class="asp-planets">${a.planet1_symbol} ${a.planet1} — ${a.planet2_symbol} ${a.planet2}</span>
-      <span class="asp-badge asp-${a.aspect}">${a.aspect_symbol} ${a.aspect} ${a.orb}°</span>
+      <span class="asp-planets">${a.planet1_symbol} ${TP(a.planet1)} — ${a.planet2_symbol} ${TP(a.planet2)}</span>
+      <span class="asp-badge asp-${a.aspect}">${a.aspect_symbol} ${TA(a.aspect)} ${a.orb}°</span>
     </div>`).join('');
 
   const houseItems=(d.houses||[]).map(h=>`
     <div class="house-item">
       <div class="h-num">${h.number}</div>
-      <div class="h-sign">${SIGN_ASTRO[h.sign]||h.sign_symbol||''} ${h.sign}</div>
+      <div class="h-sign">${SIGN_ASTRO[h.sign]||''} ${TS(h.sign)}</div>
       <div class="h-deg">${h.degree}°</div>
     </div>`).join('');
 
   document.getElementById('chart-result').innerHTML=`
   <div class="result-card">
     <div class="big3">
-      <div class="big3-item"><div class="big3-label">${T('lbl_sun')}</div><span class="big3-symbol">${SIGN_ASTRO[d.sun_sign]||'☉'}</span><div class="big3-sign">${d.sun_sign}</div></div>
-      <div class="big3-item"><div class="big3-label">${T('lbl_moon')}</div><span class="big3-symbol">${SIGN_ASTRO[d.moon_sign]||'☽'}</span><div class="big3-sign">${d.moon_sign}</div></div>
-      <div class="big3-item"><div class="big3-label">${T('lbl_asc')}</div><span class="big3-symbol">${SIGN_ASTRO[d.ascendant]||'↑'}</span><div class="big3-sign">${d.ascendant}</div></div>
+      <div class="big3-item"><div class="big3-label">${T('lbl_sun')}</div><span class="big3-symbol">${SIGN_ASTRO[d.sun_sign]||'☉'}</span><div class="big3-sign">${TS(d.sun_sign)}</div></div>
+      <div class="big3-item"><div class="big3-label">${T('lbl_moon')}</div><span class="big3-symbol">${SIGN_ASTRO[d.moon_sign]||'☽'}</span><div class="big3-sign">${TS(d.moon_sign)}</div></div>
+      <div class="big3-item"><div class="big3-label">${T('lbl_asc')}</div><span class="big3-symbol">${SIGN_ASTRO[d.ascendant]||'↑'}</span><div class="big3-sign">${TS(d.ascendant)}</div></div>
     </div>
     <div class="chart-layout">
       <div class="wheel-box">
@@ -537,8 +608,8 @@ function renderChart(d){
       </div>
     </div>
     <div class="aspects-section">
-      <div class="section-title">${T('sec_aspects')} · ${(d.aspects||[]).length} found</div>
-      <div class="aspects-grid">${aspRows||'<p style="color:var(--text-dim);font-size:.8rem">No major aspects computed.</p>'}</div>
+      <div class="section-title">${T('sec_aspects')} · ${(d.aspects||[]).length}</div>
+      <div class="aspects-grid">${aspRows||'<p style="color:var(--text-dim);font-size:.8rem">—</p>'}</div>
     </div>
     <div class="houses-section">
       <div class="section-title">${T('sec_houses')}</div>
@@ -551,8 +622,8 @@ function renderChart(d){
 
 async function getChart(){
   const data=parseBirth('c-');
-  if(!data||!data.name||!data.city){document.getElementById('chart-result').innerHTML='<div class="error">Please fill in name, date, and city.</div>';return;}
-  document.getElementById('chart-result').innerHTML='<div class="loading">'+T('loading_chart')+'</div>';
+  if(!data||!data.name||!data.city){document.getElementById('chart-result').innerHTML=`<div class="error">${T('err_fill_chart')}</div>`;return;}
+  document.getElementById('chart-result').innerHTML=`<div class="loading">${T('loading_chart')}</div>`;
   try{
     const res=await fetch('/api/chart',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
     const d=await res.json();
@@ -563,13 +634,13 @@ async function getChart(){
 
 async function getCompatibility(){
   const p1=parseBirth('p1-');const p2=parseBirth('p2-');
-  if(!p1||!p2||!p1.name||!p2.name){document.getElementById('compat-result').innerHTML='<div class="error">Please fill in both people\'s details.</div>';return;}
-  document.getElementById('compat-result').innerHTML='<div class="loading">'+T('loading_compat')+'</div>';
+  if(!p1||!p2||!p1.name||!p2.name){document.getElementById('compat-result').innerHTML=`<div class="error">${T('err_fill_compat')}</div>`;return;}
+  document.getElementById('compat-result').innerHTML=`<div class="loading">${T('loading_compat')}</div>`;
   try{
     const res=await fetch('/api/compatibility',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({person1:p1,person2:p2})});
     const d=await res.json();
     if(!res.ok)throw new Error(d.detail);
-    const asps=d.aspects.map(a=>`<div class="asp-row"><span class="asp-planets">${p1.name}'s ${a.planet1} — ${p2.name}'s ${a.planet2}</span><span class="asp-badge asp-${a.aspect}">${a.aspect} ${a.orb}°</span></div>`).join('');
+    const asps=d.aspects.map(a=>`<div class="asp-row"><span class="asp-planets">${TP(p1.name)}'s ${TP(a.planet1)} — ${TP(p2.name)}'s ${TP(a.planet2)}</span><span class="asp-badge asp-${a.aspect}">${TA(a.aspect)} ${a.orb}°</span></div>`).join('');
     document.getElementById('compat-result').innerHTML=`
     <div class="result-card" style="margin-top:24px">
       <div class="score-ring"><div class="score-num">${d.score}</div><div class="score-lbl">${T('sec_score')}</div></div>
@@ -584,13 +655,13 @@ async function getCompatibility(){
 async function getHoroscope(sign,btn){
   document.querySelectorAll('.sign-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('horoscope-result').innerHTML='<div class="loading">'+T('loading_horo')+'</div>';
+  document.getElementById('horoscope-result').innerHTML=`<div class="loading">${T('loading_horo')}</div>`;
   try{
     const res=await fetch(`/api/horoscope/${sign}`);
     const d=await res.json();
     document.getElementById('horoscope-result').innerHTML=`
     <div class="horo-result">
-      <div class="horo-title">${SIGN_SYMBOLS[sign]||''} ${d.sign}</div>
+      <div class="horo-title">${SIGN_ASTRO[sign]||''} ${TS(sign)}</div>
       <div class="horo-date">${d.date}</div>
       <p class="horo-body">${TH(sign)}</p>
     </div>`;
