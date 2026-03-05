@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from kerykeion import AstrologicalSubject, NatalAspects, SynastryAspects
+from kerykeion import AstrologicalSubject, SynastryAspects
 from datetime import datetime
 
 app = FastAPI(title="Lumina Astrology Engine")
@@ -77,17 +77,38 @@ HOROSCOPES = {
     "Pisces": "Neptune dissolves boundaries between worlds. Intuition speaks louder than logic today. Dreams carry messages worth decoding.",
 }
 
+HOUSE_ROMAN = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII']
 
-HOUSE_ROMAN = {
-    "First_House": "I", "Second_House": "II", "Third_House": "III",
-    "Fourth_House": "IV", "Fifth_House": "V", "Sixth_House": "VI",
-    "Seventh_House": "VII", "Eighth_House": "VIII", "Ninth_House": "IX",
-    "Tenth_House": "X", "Eleventh_House": "XI", "Twelfth_House": "XII",
-}
 
-def house_to_roman(h):
-    if not h: return "?"
-    return HOUSE_ROMAN.get(h, h)
+def get_house_roman(p):
+    """Try every possible attribute kerykeion might use for house placement."""
+    for attr in ('house_name', 'house', 'in_house', 'house_number', 'house_id', 'natal_house'):
+        val = getattr(p, attr, None)
+        if val is None:
+            continue
+        s = str(val).strip()
+        if not s or s == 'None':
+            continue
+        # already roman
+        upper = s.upper()
+        if upper in ('I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'):
+            return upper
+        # numeric
+        digits = ''.join(c for c in s if c.isdigit())
+        if digits:
+            n = int(digits)
+            if 1 <= n <= 12:
+                return HOUSE_ROMAN[n - 1]
+        # named like first_house, First_House
+        named = {
+            'first':1,'second':2,'third':3,'fourth':4,'fifth':5,'sixth':6,
+            'seventh':7,'eighth':8,'ninth':9,'tenth':10,'eleventh':11,'twelfth':12
+        }
+        clean = s.lower().replace('_house','').replace(' house','').strip()
+        if clean in named:
+            return HOUSE_ROMAN[named[clean] - 1]
+    return None
+
 
 def get_sign(sign_str):
     key = sign_str[:3].capitalize()
@@ -104,6 +125,7 @@ def extract_planet(subject, attr):
     try:
         p = getattr(subject, attr)
         si = get_sign(p.sign)
+        house = get_house_roman(p)
         return {
             "name": p.name, "attr": attr,
             "symbol": PLANET_SYMBOLS.get(p.name, p.name[:2]),
@@ -112,7 +134,7 @@ def extract_planet(subject, attr):
             "element": si[2], "modality": si[3],
             "degree": round(p.position, 4),
             "abs_degree": round(abs_pos(p.sign, p.position), 4),
-            "house": house_to_roman(getattr(p, 'house_name', '?')),
+            "house": house or "",
             "retrograde": getattr(p, 'retrograde', False),
             "meaning": PLANET_MEANINGS.get(p.name, ""),
         }
@@ -158,9 +180,27 @@ def compute_houses(subject):
 async def root():
     return FileResponse("static/index.html")
 
+
+# Debug endpoint — call /api/debug with birth data to see raw planet attrs
+@app.post("/api/debug")
+async def debug_chart(data: BirthData):
+    try:
+        s = AstrologicalSubject(
+            name=data.name, year=data.year, month=data.month, day=data.day,
+            hour=data.hour, minute=data.minute, city=data.city, nation=data.nation, online=True,
+        )
+        p = s.sun
+        attrs = {a: str(getattr(p, a, 'N/A')) for a in dir(p) if not a.startswith('_')}
+        return {"sun_attrs": attrs}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
 @app.post("/api/chart")
 async def get_chart(data: BirthData):
     try:
+        is_cosmogram = (data.hour == 12 and data.minute == 0)
+
         s = AstrologicalSubject(
             name=data.name, year=data.year, month=data.month, day=data.day,
             hour=data.hour, minute=data.minute, city=data.city, nation=data.nation, online=True,
@@ -168,35 +208,41 @@ async def get_chart(data: BirthData):
         planet_attrs = ["sun","moon","mercury","venus","mars","jupiter","saturn","uranus","neptune","pluto","mean_node","chiron"]
         planets = [p for p in [extract_planet(s, a) for a in planet_attrs] if p]
 
-        for name, attr, sym, meaning in [("Asc","first_house","AC","rising sign, outer self"),("MC","tenth_house","MC","career, public life, destiny")]:
-            try:
-                h = getattr(s, attr)
-                si = get_sign(h.sign)
-                planets.append({"name": name, "attr": attr, "symbol": sym,
-                    "sign": si[0], "sign_symbol": si[1], "sign_key": h.sign[:3].capitalize(),
-                    "element": si[2], "modality": si[3], "degree": round(h.position, 2),
-                    "abs_degree": round(abs_pos(h.sign, h.position), 4),
-                    "house": "I" if name=="Asc" else "X", "retrograde": False, "meaning": meaning})
-            except Exception:
-                pass
+        if not is_cosmogram:
+            for name, attr, sym, meaning in [("Asc","first_house","AC","rising sign, outer self"),("MC","tenth_house","MC","career, public life, destiny")]:
+                try:
+                    h = getattr(s, attr)
+                    si = get_sign(h.sign)
+                    planets.append({"name": name, "attr": attr, "symbol": sym,
+                        "sign": si[0], "sign_symbol": si[1], "sign_key": h.sign[:3].capitalize(),
+                        "element": si[2], "modality": si[3], "degree": round(h.position, 2),
+                        "abs_degree": round(abs_pos(h.sign, h.position), 4),
+                        "house": "I" if name=="Asc" else "X", "retrograde": False, "meaning": meaning})
+                except Exception:
+                    pass
 
         aspects = compute_aspects([p for p in planets if p["name"] not in ["Asc","MC"]])
-        houses = compute_houses(s)
+        houses = compute_houses(s) if not is_cosmogram else []
+
         sun_info = get_sign(s.sun.sign)
         moon_info = get_sign(s.moon.sign)
         asc_info = get_sign(s.first_house.sign)
+        asc_abs = round(abs_pos(s.first_house.sign, s.first_house.position), 4)
 
         return {
             "name": data.name,
+            "is_cosmogram": is_cosmogram,
             "sun_sign": sun_info[0], "sun_symbol": sun_info[1],
             "moon_sign": moon_info[0], "moon_symbol": moon_info[1],
-            "ascendant": asc_info[0], "asc_symbol": asc_info[1],
-            "asc_abs": round(abs_pos(s.first_house.sign, s.first_house.position), 4),
+            "ascendant": asc_info[0] if not is_cosmogram else None,
+            "asc_symbol": asc_info[1] if not is_cosmogram else None,
+            "asc_abs": asc_abs if not is_cosmogram else 0,
             "planets": planets, "aspects": aspects, "houses": houses,
             "horoscope": HOROSCOPES.get(sun_info[0], "The stars have a unique message for you today."),
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
 
 @app.post("/api/compatibility")
 async def get_compatibility(data: CompatibilityData):
@@ -222,10 +268,11 @@ async def get_compatibility(data: CompatibilityData):
                 else f"{p1.name} and {p2.name} challenge and transform each other. Tension, when navigated consciously, forges depth." if score>=40
                 else f"{p1.name} and {p2.name} walk very different cosmic paths. Understanding requires patience and real effort."
             ),
-            "aspects": [{"planet1":a["p1_name"],"planet2":a["p2_name"],"aspect":a["aspect"],"orb":round(a["orbit"],2)} for a in aspects[:15]],
+            "aspects": [{"p1_name":a["p1_name"],"p2_name":a["p2_name"],"aspect":a["aspect"],"orbit":a["orbit"]} for a in aspects[:15]],
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
 
 @app.get("/api/horoscope/{sign}")
 async def get_horoscope(sign: str):
