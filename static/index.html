@@ -226,7 +226,24 @@ const SIGN_SYMS=['♈︎','♉︎','♊︎','♋︎','♌︎','♍︎','♎︎',
 const SIGN_ELEM=['Fire','Earth','Air','Water','Fire','Earth','Air','Water','Fire','Earth','Air','Water'];
 const ELEM_COLORS={Fire:'#e8906a',Earth:'#8ab56a',Air:'#6ab5d4',Water:'#7b6cff'};
 const SIGN_ASTRO={'Aries':'♈︎','Taurus':'♉︎','Gemini':'♊︎','Cancer':'♋︎','Leo':'♌︎','Virgo':'♍︎','Libra':'♎︎','Scorpio':'♏︎','Sagittarius':'♐︎','Capricorn':'♑︎','Aquarius':'♒︎','Pisces':'♓︎'};
-const HOUSE_MAP={'First_House':'I','Second_House':'II','Third_House':'III','Fourth_House':'IV','Fifth_House':'V','Sixth_House':'VI','Seventh_House':'VII','Eighth_House':'VIII','Ninth_House':'IX','Tenth_House':'X','Eleventh_House':'XI','Twelfth_House':'XII','I':'I','II':'II','III':'III','IV':'IV','V':'V','VI':'VI','VII':'VII','VIII':'VIII','IX':'IX','X':'X','XI':'XI','XII':'XII'};
+const HOUSE_MAP={
+  'First_House':'I','Second_House':'II','Third_House':'III','Fourth_House':'IV',
+  'Fifth_House':'V','Sixth_House':'VI','Seventh_House':'VII','Eighth_House':'VIII',
+  'Ninth_House':'IX','Tenth_House':'X','Eleventh_House':'XI','Twelfth_House':'XII',
+  'first_house':'I','second_house':'II','third_house':'III','fourth_house':'IV',
+  'fifth_house':'V','sixth_house':'VI','seventh_house':'VII','eighth_house':'VIII',
+  'ninth_house':'IX','tenth_house':'X','eleventh_house':'XI','twelfth_house':'XII',
+  '1':'I','2':'II','3':'III','4':'IV','5':'V','6':'VI',
+  '7':'VII','8':'VIII','9':'IX','10':'X','11':'XI','12':'XII',
+  'I':'I','II':'II','III':'III','IV':'IV','V':'V','VI':'VI',
+  'VII':'VII','VIII':'VIII','IX':'IX','X':'X','XI':'XI','XII':'XII',
+};
+
+// store last rendered data so we can re-render on lang change
+let _lastChartData=null;
+let _lastCompatData=null;
+let _lastCompatP1=null;
+let _lastCompatP2=null;
 
 function switchTab(n,el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));el.classList.add('active');document.getElementById('panel-'+n).classList.add('active')}
 
@@ -456,6 +473,9 @@ function setLang(lang,btn){
     const key=el.getAttribute('data-i18n-placeholder');
     if(t[key]!==undefined)el.placeholder=t[key];
   });
+  // re-render any existing results in the new language
+  if(_lastChartData)renderChart(_lastChartData);
+  if(_lastCompatData)renderCompat(_lastCompatData,_lastCompatP1,_lastCompatP2);
 }
 
 function T(key){return(LANGS[currentLang]&&LANGS[currentLang][key])||LANGS.en[key]||key;}
@@ -550,6 +570,7 @@ function buildWheel(data){
 
 // ── RENDER ───────────────────────────────────────────────────────────
 function renderChart(d){
+  _lastChartData=d;
   const planetRows=(d.planets||[]).filter(p=>!['Asc','MC'].includes(p.name)).map(p=>{
     const ec=p.element?`elem-${p.element.toLowerCase()}`:'';
     const deg=Math.floor(p.degree);const min=Math.round((p.degree%1)*60);
@@ -640,16 +661,23 @@ async function getCompatibility(){
     const res=await fetch('/api/compatibility',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({person1:p1,person2:p2})});
     const d=await res.json();
     if(!res.ok)throw new Error(d.detail);
-    const asps=d.aspects.map(a=>`<div class="asp-row"><span class="asp-planets">${TP(p1.name)}'s ${TP(a.planet1)} — ${TP(p2.name)}'s ${TP(a.planet2)}</span><span class="asp-badge asp-${a.aspect}">${TA(a.aspect)} ${a.orb}°</span></div>`).join('');
-    document.getElementById('compat-result').innerHTML=`
-    <div class="result-card" style="margin-top:24px">
-      <div class="score-ring"><div class="score-num">${d.score}</div><div class="score-lbl">${T('sec_score')}</div></div>
-      <div class="score-bar"><div class="score-fill" style="width:${d.score}%"></div></div>
-      <p class="compat-summary">${d.summary}</p>
-      <div class="section-title" style="margin-top:16px">${T('sec_synastry')}</div>
-      <div class="aspects-grid">${asps}</div>
-    </div>`;
+    _lastCompatData=d;_lastCompatP1=p1;_lastCompatP2=p2;
+    renderCompat(d,p1,p2);
   }catch(e){document.getElementById('compat-result').innerHTML=`<div class="error">Error: ${e.message}</div>`;}
+}
+
+function renderCompat(d,p1,p2){
+  if(!d)return;
+  p1=p1||_lastCompatP1;p2=p2||_lastCompatP2;
+  const asps=d.aspects.map(a=>`<div class="asp-row"><span class="asp-planets">${p1.name} ${TP(a.planet1)} — ${p2.name} ${TP(a.planet2)}</span><span class="asp-badge asp-${a.aspect}">${TA(a.aspect)} ${a.orb}°</span></div>`).join('');
+  document.getElementById('compat-result').innerHTML=`
+  <div class="result-card" style="margin-top:24px">
+    <div class="score-ring"><div class="score-num">${d.score}</div><div class="score-lbl">${T('sec_score')}</div></div>
+    <div class="score-bar"><div class="score-fill" style="width:${d.score}%"></div></div>
+    <p class="compat-summary">${d.summary}</p>
+    <div class="section-title" style="margin-top:16px">${T('sec_synastry')}</div>
+    <div class="aspects-grid">${asps}</div>
+  </div>`;
 }
 
 async function getHoroscope(sign,btn){
