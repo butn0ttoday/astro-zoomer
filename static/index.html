@@ -475,25 +475,31 @@ function buildWheel(data){
 }
 
 // ── RENDER ───────────────────────────────────────────────────────────
+const HOUSE_MAP={'First_House':'I','Second_House':'II','Third_House':'III','Fourth_House':'IV','Fifth_House':'V','Sixth_House':'VI','Seventh_House':'VII','Eighth_House':'VIII','Ninth_House':'IX','Tenth_House':'X','Eleventh_House':'XI','Twelfth_House':'XII','I':'I','II':'II','III':'III','IV':'IV','V':'V','VI':'VI','VII':'VII','VIII':'VIII','IX':'IX','X':'X','XI':'XI','XII':'XII'};
+const SIGN_ASTRO={'Aries':'♈︎','Taurus':'♉︎','Gemini':'♊︎','Cancer':'♋︎','Leo':'♌︎','Virgo':'♍︎','Libra':'♎︎','Scorpio':'♏︎','Sagittarius':'♐︎','Capricorn':'♑︎','Aquarius':'♒︎','Pisces':'♓︎'};
+
 function renderChart(d){
   const planetRows=(d.planets||[]).filter(p=>!['Asc','MC'].includes(p.name)).map(p=>{
     const ec=p.element?`elem-${p.element.toLowerCase()}`:'';
     const deg=Math.floor(p.degree);const min=Math.round((p.degree%1)*60);
+    const houseNum=HOUSE_MAP[p.house]||p.house||'';
+    const signSym=SIGN_ASTRO[p.sign]||p.sign_symbol||'';
     return`<div class="planet-row">
       <span class="p-sym">${p.symbol||p.name[0]}</span>
       <span class="p-name">${p.name}${p.retrograde?` <span class="retro">℞</span>`:''}</span>
-      <span class="p-sign ${ec}">${p.sign_symbol||''} ${p.sign}</span>
+      <span class="p-sign ${ec}">${signSym} ${p.sign}</span>
       <span class="p-deg">${deg}°${min}'</span>
-      <span class="p-house">${p.house||''}</span>
+      <span class="p-house">${houseNum}</span>
     </div>`;
   }).join('');
 
   const specialRows=(d.planets||[]).filter(p=>['Asc','MC'].includes(p.name)).map(p=>{
     const deg=Math.floor(p.degree);const min=Math.round((p.degree%1)*60);
+    const signSym=SIGN_ASTRO[p.sign]||p.sign_symbol||'';
     return`<div class="planet-row" style="opacity:.7">
       <span class="p-sym" style="font-size:.7rem;color:#8a6e30">${p.symbol}</span>
       <span class="p-name" style="color:#8a6e30">${p.name}</span>
-      <span class="p-sign">${p.sign_symbol||''} ${p.sign}</span>
+      <span class="p-sign">${signSym} ${p.sign}</span>
       <span class="p-deg">${deg}°${min}'</span>
       <span></span>
     </div>`;
@@ -508,16 +514,16 @@ function renderChart(d){
   const houseItems=(d.houses||[]).map(h=>`
     <div class="house-item">
       <div class="h-num">${h.number}</div>
-      <div class="h-sign">${h.sign_symbol} ${h.sign}</div>
+      <div class="h-sign">${SIGN_ASTRO[h.sign]||h.sign_symbol||''} ${h.sign}</div>
       <div class="h-deg">${h.degree}°</div>
     </div>`).join('');
 
   document.getElementById('chart-result').innerHTML=`
   <div class="result-card">
     <div class="big3">
-      <div class="big3-item"><div class="big3-label">${T('lbl_sun')}</div><span class="big3-symbol">${d.sun_symbol||SIGN_SYMBOLS[d.sun_sign]||'☀️'}</span><div class="big3-sign">${d.sun_sign}</div></div>
-      <div class="big3-item"><div class="big3-label">${T('lbl_moon')}</div><span class="big3-symbol">${d.moon_symbol||SIGN_SYMBOLS[d.moon_sign]||'🌙'}</span><div class="big3-sign">${d.moon_sign}</div></div>
-      <div class="big3-item"><div class="big3-label">${T('lbl_asc')}</div><span class="big3-symbol">${d.asc_symbol||SIGN_SYMBOLS[d.ascendant]||'⬆'}</span><div class="big3-sign">${d.ascendant}</div></div>
+      <div class="big3-item"><div class="big3-label">${T('lbl_sun')}</div><span class="big3-symbol">${SIGN_ASTRO[d.sun_sign]||'☉'}</span><div class="big3-sign">${d.sun_sign}</div></div>
+      <div class="big3-item"><div class="big3-label">${T('lbl_moon')}</div><span class="big3-symbol">${SIGN_ASTRO[d.moon_sign]||'☽'}</span><div class="big3-sign">${d.moon_sign}</div></div>
+      <div class="big3-item"><div class="big3-label">${T('lbl_asc')}</div><span class="big3-symbol">${SIGN_ASTRO[d.ascendant]||'↑'}</span><div class="big3-sign">${d.ascendant}</div></div>
     </div>
     <div class="chart-layout">
       <div class="wheel-box">
