@@ -194,20 +194,17 @@ footer{text-align:center;padding:50px 0 36px;color:var(--text-dim);font-size:.64
   </div>
 
   <div class="panel" id="panel-transits">
-    <div class="form-card">
-      <div class="form-title" data-i18n="transit_title">◈ Natal Data</div>
+    <div id="sky-result"></div>
+    <div class="form-card" style="margin-top:24px">
+      <div class="form-title" data-i18n="transit_personal_title">◈ Personal Transits</div>
+      <div style="font-size:.72rem;color:var(--text-dim);margin-bottom:16px;letter-spacing:.06em" data-i18n="transit_personal_hint">Enter your birth data to overlay your natal chart</div>
       <div class="form-grid">
         <div class="form-group full"><label data-i18n="label_name">Full Name</label><input type="text" id="t-name" data-i18n-placeholder="ph_name" placeholder="Your name"/></div>
         <div class="form-group"><label data-i18n="label_dob">Date of Birth</label><input type="date" id="t-date"/></div>
         <div class="form-group"><label data-i18n="label_tob">Time of Birth</label><input type="time" id="t-time" value="12:00"/></div>
         <div class="form-group"><label data-i18n="label_city">City</label><input type="text" id="t-city" data-i18n-placeholder="ph_city" placeholder="e.g. London"/></div>
         <div class="form-group"><label data-i18n="label_country">Country Code</label><input type="text" id="t-nation" data-i18n-placeholder="ph_country" placeholder="e.g. GB" maxlength="3"/></div>
-      </div>
-    </div>
-    <div class="form-card">
-      <div class="form-title" data-i18n="transit_date_title">◈ Transit Date</div>
-      <div class="form-grid">
-        <div class="form-group"><label data-i18n="transit_date_label">Date (leave blank for today)</label><input type="date" id="t-transit-date"/></div>
+        <div class="form-group"><label data-i18n="transit_date_label">Transit date</label><input type="date" id="t-transit-date"/></div>
       </div>
       <br><button class="btn" onclick="getTransits()" data-i18n="btn_transits">Calculate Transits</button>
     </div>
@@ -270,7 +267,13 @@ let _lastCompatData=null;
 let _lastCompatP1=null;
 let _lastCompatP2=null;
 
-function switchTab(n,el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));el.classList.add('active');document.getElementById('panel-'+n).classList.add('active')}
+function switchTab(n,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-'+n).classList.add('active');
+  if(n==='transits')loadSky();
+}
 
 // mobile tap for aspect tooltips
 document.addEventListener('click',e=>{
@@ -322,7 +325,7 @@ const LANGS={
     compat_medium:"{p1} and {p2} complement each other beautifully. Growth and harmony intertwine in your connection.",
     compat_low:"{p1} and {p2} challenge and transform each other. Tension, navigated consciously, forges depth.",
     compat_challenging:"{p1} and {p2} walk very different cosmic paths. Understanding requires patience and real effort.",
-    tab_transits:"Transits",transit_title:"◈ Natal Data",transit_date_title:"◈ Transit Date",transit_date_label:"Transit date",btn_transits:"Calculate Transits",loading_transits:"Mapping the sky",sec_transit_wheel:"◈ Transit Chart",sec_transit_aspects:"◈ Transit Aspects",natal_label:"Natal",transit_label:"Transit",
+    tab_transits:"Transits",transit_title:"◈ Natal Data",transit_date_title:"◈ Transit Date",transit_date_label:"Transit date",btn_transits:"Calculate Transits",loading_transits:"Mapping the sky",loading_sky:"Reading the current sky",sec_sky:"◈ Current Sky",transit_personal_title:"◈ Personal Transits",transit_personal_hint:"Enter your birth data to overlay your natal chart",sec_transit_wheel:"◈ Transit Chart",sec_transit_aspects:"◈ Transit Aspects",natal_label:"Natal",transit_label:"Transit",
     sec_cosmogram:"◈ Cosmogram — no birth time",
     warn_noon:"⚠ If 12:00 is your actual birth time, enter 12:01 for a more accurate chart. Without an exact time, a cosmogram (no houses or Ascendant) will be shown.",
     sec_wheel_cosmo:"◈ Cosmogram",
@@ -372,7 +375,7 @@ const LANGS={
     compat_medium:"{p1} и {p2} прекрасно дополняют друг друга. Рост и гармония переплетаются в вашей связи.",
     compat_low:"{p1} и {p2} бросают вызов и трансформируют друг друга. Напряжение, осознанно пройденное, рождает глубину.",
     compat_challenging:"{p1} и {p2} идут очень разными космическими путями. Понимание требует терпения и реальных усилий.",
-    tab_transits:"Транзиты",transit_title:"◈ Натальные данные",transit_date_title:"◈ Дата транзита",transit_date_label:"Дата транзита",btn_transits:"Рассчитать транзиты",loading_transits:"Картографируем небо",sec_transit_wheel:"◈ Транзитная карта",sec_transit_aspects:"◈ Транзитные аспекты",natal_label:"Натал",transit_label:"Транзит",
+    tab_transits:"Транзиты",transit_title:"◈ Натальные данные",transit_date_title:"◈ Дата транзита",transit_date_label:"Дата транзита",btn_transits:"Рассчитать транзиты",loading_transits:"Картографируем небо",loading_sky:"Читаем текущее небо",sec_sky:"◈ Текущее небо",transit_personal_title:"◈ Личные транзиты",transit_personal_hint:"Введите данные рождения чтобы наложить натальную карту",sec_transit_wheel:"◈ Транзитная карта",sec_transit_aspects:"◈ Транзитные аспекты",natal_label:"Натал",transit_label:"Транзит",
     sec_cosmogram:"◈ Космограмма — без времени рождения",
     warn_noon:"⚠ Если 12:00 — ваше реальное время рождения, введите 12:01 для более точной карты. Без точного времени будет построена космограмма (без домов и асцендента).",
     sec_wheel_cosmo:"◈ Космограмма",
@@ -422,7 +425,7 @@ const LANGS={
     compat_medium:"{p1} e {p2} si completano meravigliosamente. Crescita e armonia si intrecciano nella vostra connessione.",
     compat_low:"{p1} e {p2} si sfidano e si trasformano a vicenda. La tensione, affrontata consciamente, forgia profondità.",
     compat_challenging:"{p1} e {p2} camminano su percorsi cosmici molto diversi. La comprensione richiede pazienza e vero impegno.",
-    tab_transits:"Transiti",transit_title:"◈ Dati natali",transit_date_title:"◈ Data del transito",transit_date_label:"Data transito",btn_transits:"Calcola transiti",loading_transits:"Mappando il cielo",sec_transit_wheel:"◈ Carta dei transiti",sec_transit_aspects:"◈ Aspetti di transito",natal_label:"Natale",transit_label:"Transito",
+    tab_transits:"Transiti",transit_title:"◈ Dati natali",transit_date_title:"◈ Data del transito",transit_date_label:"Data transito",btn_transits:"Calcola transiti",loading_transits:"Mappando il cielo",loading_sky:"Leggiamo il cielo attuale",sec_sky:"◈ Cielo attuale",transit_personal_title:"◈ Transiti personali",transit_personal_hint:"Inserisci i dati di nascita per sovrapporre il tema natale",sec_transit_wheel:"◈ Carta dei transiti",sec_transit_aspects:"◈ Aspetti di transito",natal_label:"Natale",transit_label:"Transito",
     sec_cosmogram:"◈ Cosmogramma — senza orario di nascita",
     warn_noon:"⚠ Se le 12:00 sono il tuo orario di nascita reale, inserisci 12:01 per un tema più accurato. Senza un orario preciso verrà mostrato un cosmogramma (senza case o Ascendente).",
     sec_wheel:"◈ Ruota del tema natale",sec_wheel_cosmo:"◈ Cosmogramma",
@@ -476,7 +479,7 @@ const LANGS={
     compat_medium:"{p1} und {p2} ergänzen sich wunderbar. Wachstum und Harmonie verweben sich in eurer Verbindung.",
     compat_low:"{p1} und {p2} fordern und transformieren einander. Bewusst gelebte Spannung schafft Tiefe.",
     compat_challenging:"{p1} und {p2} gehen sehr unterschiedliche kosmische Wege. Verständnis erfordert Geduld und echte Mühe.",
-    tab_transits:"Transite",transit_title:"◈ Geburtsdaten",transit_date_title:"◈ Transitdatum",transit_date_label:"Transitdatum",btn_transits:"Transite berechnen",loading_transits:"Den Himmel kartieren",sec_transit_wheel:"◈ Transithimmel",sec_transit_aspects:"◈ Transitaspekte",natal_label:"Natal",transit_label:"Transit",
+    tab_transits:"Transite",transit_title:"◈ Geburtsdaten",transit_date_title:"◈ Transitdatum",transit_date_label:"Transitdatum",btn_transits:"Transite berechnen",loading_transits:"Den Himmel kartieren",loading_sky:"Wir lesen den aktuellen Himmel",sec_sky:"◈ Aktueller Himmel",transit_personal_title:"◈ Persönliche Transite",transit_personal_hint:"Geburtsdaten eingeben, um das Geburtshoroskop zu überlagern",sec_transit_wheel:"◈ Transithimmel",sec_transit_aspects:"◈ Transitaspekte",natal_label:"Natal",transit_label:"Transit",
     sec_cosmogram:"◈ Kosmogramm — ohne Geburtszeit",
     warn_noon:"⚠ Wenn 12:00 deine tatsächliche Geburtszeit ist, gib 12:01 ein für ein genaueres Horoskop. Ohne genaue Zeit wird ein Kosmogramm angezeigt (ohne Häuser oder Aszendent).",
     sec_wheel:"◈ Horoskoprad",sec_wheel_cosmo:"◈ Kosmogramm",
@@ -530,7 +533,7 @@ const LANGS={
     compat_medium:"{p1} i {p2} pięknie się uzupełniają. Wzrost i harmonia przeplatają się w waszej więzi.",
     compat_low:"{p1} i {p2} wyzywają i transformują się nawzajem. Napięcie, świadomie przeżyte, rodzi głębię.",
     compat_challenging:"{p1} i {p2} kroczą bardzo różnymi kosmicznymi ścieżkami. Zrozumienie wymaga cierpliwości i prawdziwego wysiłku.",
-    tab_transits:"Tranzyty",transit_title:"◈ Dane urodzenia",transit_date_title:"◈ Data tranzytu",transit_date_label:"Data tranzytu",btn_transits:"Oblicz tranzyty",loading_transits:"Mapujemy niebo",sec_transit_wheel:"◈ Karta tranzytów",sec_transit_aspects:"◈ Aspekty tranzytów",natal_label:"Natal",transit_label:"Tranzyt",
+    tab_transits:"Tranzyty",transit_title:"◈ Dane urodzenia",transit_date_title:"◈ Data tranzytu",transit_date_label:"Data tranzytu",btn_transits:"Oblicz tranzyty",loading_transits:"Mapujemy niebo",loading_sky:"Czytamy aktualne niebo",sec_sky:"◈ Aktualne niebo",transit_personal_title:"◈ Osobiste tranzyty",transit_personal_hint:"Wprowadź dane urodzenia, aby nałożyć kartę urodzenia",sec_transit_wheel:"◈ Karta tranzytów",sec_transit_aspects:"◈ Aspekty tranzytów",natal_label:"Natal",transit_label:"Tranzyt",
     sec_cosmogram:"◈ Kosmogram — bez godziny urodzenia",
     warn_noon:"⚠ Jeśli 12:00 to twoja rzeczywista godzina urodzenia, wpisz 12:01 dla dokładniejszej karty. Bez dokładnej godziny zostanie pokazany kosmogram (bez domów i Ascendentu).",
     sec_wheel_cosmo:"◈ Kosmogram",
@@ -1082,6 +1085,75 @@ function renderTransits(d){
   </div>`;
 }
 
+// ── CURRENT SKY ──────────────────────────────────────────────────────
+let _skyLoaded=false;
+
+async function loadSky(){
+  if(_skyLoaded)return;
+  const el=document.getElementById('sky-result');
+  if(!el)return;
+  el.innerHTML=`<div class="loading">${T('loading_sky')}</div>`;
+  try{
+    const res=await fetch('/api/sky');
+    const d=await res.json();
+    if(!res.ok)throw new Error(d.detail);
+    _skyLoaded=true;
+    renderSky(d);
+  }catch(e){el.innerHTML=`<div class="error">Error: ${e.message}</div>`;}
+}
+
+function renderSky(d){
+  const el=document.getElementById('sky-result');
+  if(!el)return;
+
+  const planetRows=(d.planets||[]).map(p=>{
+    const deg=Math.floor(p.degree);const min=Math.round((p.degree%1)*60);
+    const signSym=SIGN_ASTRO[p.sign]||'';
+    const ec=p.element?`elem-${p.element.toLowerCase()}`:'';
+    return`<div class="planet-row">
+      <span class="p-sym">${p.symbol}</span>
+      <span class="p-name">${TP(p.name)}${p.retrograde?` <span class="retro">℞</span>`:''}</span>
+      <span class="p-sign ${ec}">${signSym} ${TS(p.sign)}</span>
+      <span class="p-deg">${deg}°${min}'</span>
+      <span></span>
+    </div>`;
+  }).join('');
+
+  const aspRows=(d.aspects||[]).slice(0,20).map(a=>{
+    const tip=`${TP(a.planet1)} ${TA(a.aspect)} ${TP(a.planet2)} · ${a.orb}°`;
+    return`<div class="asp-row asp-tip" tabindex="0">
+      <span class="asp-planets">${a.planet1_symbol} ${TP(a.planet1)} — ${a.planet2_symbol} ${TP(a.planet2)}</span>
+      <span class="asp-badge asp-${a.aspect}">${a.aspect_symbol} ${TA(a.aspect)} ${a.orb}°</span>
+      <div class="asp-tooltip">${tip}</div>
+    </div>`;
+  }).join('');
+
+  // reuse buildWheel with transit data shaped as chart data
+  const wheelData={
+    planets: d.planets, aspects: d.aspects,
+    asc_abs: 0, sun_sign: (d.planets.find(p=>p.name==='Sun')||{}).sign||'',
+    name: '', is_cosmogram: true, houses: [],
+  };
+
+  el.innerHTML=`
+  <div class="result-card">
+    <div class="section-title" style="font-size:.65rem;letter-spacing:.2em;margin-bottom:4px">${T('sec_sky')} · ${d.datetime}</div>
+    <div class="chart-layout">
+      <div class="wheel-box">
+        ${buildWheel(wheelData)}
+      </div>
+      <div class="planets-box">
+        <div class="section-title">${T('sec_planets')}</div>
+        ${planetRows}
+      </div>
+    </div>
+    <div class="aspects-section" style="margin-top:16px">
+      <div class="section-title">${T('sec_aspects')} · ${(d.aspects||[]).length}</div>
+      <div class="aspects-grid">${aspRows}</div>
+    </div>
+  </div>`;
+}
+
 async function getHoroscope(sign,btn){
   document.querySelectorAll('.sign-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
@@ -1097,6 +1169,12 @@ async function getHoroscope(sign,btn){
     </div>`;
   }catch(e){document.getElementById('horoscope-result').innerHTML=`<div class="error">Error: ${e.message}</div>`;}
 }
+
+// auto-load sky on page start
+document.addEventListener('DOMContentLoaded', ()=>{
+  // if transits tab is default active, load sky immediately
+  if(document.getElementById('panel-transits').classList.contains('active')) loadSky();
+});
 </script>
 </body>
 </html>
