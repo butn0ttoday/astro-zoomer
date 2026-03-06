@@ -53,7 +53,7 @@ nav{display:flex;flex-direction:column;gap:2px;padding:0 12px;flex:1}
 /* hide old site-bar elements that move to sidebar on desktop */
 @media(min-width:769px){
   .site-bar .site-title,.site-bar .site-tagline,.site-bar .sigil{display:none}
-  .container{max-width:none;padding:0;margin:0}
+  .container{max-width:860px;padding:0;margin:0}
 }
 @media(max-width:768px){
   .app-layout{flex-direction:column}
@@ -1248,16 +1248,16 @@ function renderCompat(d,p1,p2){
   if(!d)return;
   p1=p1||_lastCompatP1;p2=p2||_lastCompatP2;
 
-  // localized summary based on score_label
+  // summary based on actual score value (not backend label which may be stale)
+  const scoreTier = d.score >= 80 ? 'high' : d.score >= 60 ? 'medium' : d.score >= 40 ? 'low' : 'challenging';
   const summaryMap={
     high:   T('compat_high'),
     medium: T('compat_medium'),
     low:    T('compat_low'),
     challenging: T('compat_challenging'),
   };
-  const summary=summaryMap[d.score_label]
-    ? summaryMap[d.score_label].replace('{p1}',d.person1).replace('{p2}',d.person2)
-    : d.summary||'';
+  const summary=(summaryMap[scoreTier]||'')
+    .replace('{p1}',d.person1).replace('{p2}',d.person2);
 
   const aspRows=(d.aspects||[]).slice(0,30).map(a=>{
     const tip=`${TP(a.planet1)} ${TA(a.aspect)} ${TP(a.planet2)} · ${a.orb}°`;
