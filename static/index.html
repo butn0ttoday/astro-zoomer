@@ -949,6 +949,7 @@ async function getChart(){
     renderChart(d);
     scrollToResult('chart-result');
     saveLastBirthData();
+  }catch(e){document.getElementById('chart-result').innerHTML=`<div class="error">Error: ${e.message}</div>`;}
 }
 
 async function getCompatibility(){
@@ -962,6 +963,7 @@ async function getCompatibility(){
     _lastCompatData=d;_lastCompatP1=p1;_lastCompatP2=p2;
     renderCompat(d,p1,p2);
     scrollToResult('compat-result');
+  }catch(e){document.getElementById('compat-result').innerHTML=`<div class="error">Error: ${e.message}</div>`;}
 }
 
 function buildSynastryWheel(d){
@@ -1209,6 +1211,7 @@ async function getTransits(){
     _lastTransitData=d2;
     renderTransits(d2);
     scrollToResult('transit-result');
+  }catch(e){document.getElementById('transit-result').innerHTML=`<div class="error">Error: ${e.message}</div>`;}
 }
 
 function renderTransits(d){
