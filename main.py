@@ -269,10 +269,38 @@ async def get_compatibility(data: CompatibilityData):
                         })
                         break
 
-        harmonious = sum(1 for a in aspects if a["aspect"] in ["trine","sextile","conjunction"])
-        tense      = sum(1 for a in aspects if a["aspect"] in ["square","opposition"])
-        total      = len(aspects) if aspects else 1
-        score      = min(100, max(0, int((harmonious/total)*100+20)))
+        # Weighted scoring: planet importance × aspect weight
+        PLANET_WEIGHT = {
+            "Sun":7,"Moon":7,"Venus":6,"Mars":5,"Mercury":4,
+            "Jupiter":3,"Saturn":3,"Ascendant":5,"MC":2,
+            "Uranus":2,"Neptune":2,"Pluto":2,"Mean_Node":2,"Chiron":1,
+        }
+        ASPECT_WEIGHT = {
+            "conjunction": 1.0,
+            "trine":        0.85,
+            "sextile":      0.6,
+            "opposition":  -0.7,
+            "square":      -0.9,
+            "quincunx":    -0.2,
+        }
+
+        raw = 0.0
+        max_possible = 0.0
+        for a in aspects:
+            pw1 = PLANET_WEIGHT.get(a["planet1"], 2)
+            pw2 = PLANET_WEIGHT.get(a["planet2"], 2)
+            weight = (pw1 + pw2) / 2
+            aspect_val = ASPECT_WEIGHT.get(a["aspect"], 0)
+            raw += weight * aspect_val
+            max_possible += weight * 1.0  # best case = all conjunctions
+
+        if max_possible > 0:
+            # normalise to 0–1, then map to 25–95 range
+            ratio = raw / max_possible          # -1 to +1
+            score = int(25 + (ratio + 1) / 2 * 70)
+            score = min(95, max(10, score))
+        else:
+            score = 50
 
         asc1 = round(abs_pos(s1.first_house.sign, s1.first_house.position), 4)
 
