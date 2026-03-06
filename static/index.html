@@ -116,6 +116,14 @@ footer{text-align:center;padding:50px 0 36px;color:var(--text-dim);font-size:.64
 .lang-btn:hover{color:var(--gold)}
 .lang-btn.active{color:var(--gold);background:var(--surface)}
 @media(max-width:700px){.form-grid,.big3,.chart-layout,.aspects-grid,.houses-grid{grid-template-columns:1fr!important}.signs-grid{grid-template-columns:repeat(3,1fr)}.tab{padding:10px 12px;font-size:.56rem}}
+.city-wrap{position:relative}
+.city-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--deep);border:1px solid var(--gold-dim);border-top:none;z-index:200;max-height:200px;overflow-y:auto;display:none}
+.city-dropdown.open{display:block}
+.city-option{padding:9px 14px;font-size:.82rem;cursor:pointer;color:var(--text);border-bottom:1px solid var(--rim);transition:background .15s}
+.city-option:last-child{border-bottom:none}
+.city-option:hover,.city-option.focused{background:var(--surface);color:var(--gold)}
+.city-option .city-country{font-size:.68rem;color:var(--text-dim);margin-left:6px}
+.city-loading::after{content:'';display:inline-block;width:10px;height:10px;border:1px solid var(--rim);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin-left:8px;vertical-align:middle}
 </style>
 </head>
 <body>
@@ -159,8 +167,14 @@ footer{text-align:center;padding:50px 0 36px;color:var(--text-dim);font-size:.64
         <div class="form-group full"><label data-i18n="label_name">Full Name</label><input type="text" id="c-name" data-i18n-placeholder="ph_name" placeholder="Your name"/></div>
         <div class="form-group"><label data-i18n="label_dob">Date of Birth</label><input type="date" id="c-date"/></div>
         <div class="form-group"><label data-i18n="label_tob">Time of Birth</label><input type="time" id="c-time" value="12:00" oninput="checkNoonWarning(this)"/><div id="noon-warning" style="display:none;font-size:.6rem;color:#c9a84c;margin-top:5px;letter-spacing:.05em" data-i18n="warn_noon">⚠ If 12:00 is your actual birth time, enter 12:01 for a more accurate chart. Without an exact time, a cosmogram (no houses or Ascendant) will be shown.</div></div>
-        <div class="form-group"><label data-i18n="label_city">City</label><input type="text" id="c-city" data-i18n-placeholder="ph_city" placeholder="e.g. London"/></div>
-        <div class="form-group"><label data-i18n="label_country">Country Code (2 letters)</label><input type="text" id="c-nation" data-i18n-placeholder="ph_country" placeholder="e.g. GB" maxlength="3"/></div>
+        <div class="form-group full">
+          <label data-i18n="label_city">City</label>
+          <div class="city-wrap">
+            <input type="text" id="c-city" data-i18n-placeholder="ph_city" placeholder="e.g. London" autocomplete="off" oninput="cityAutocomplete(this,'c-nation','c-city-dropdown')"/>
+            <input type="hidden" id="c-nation" value="US"/>
+            <div class="city-dropdown" id="c-city-dropdown"></div>
+          </div>
+        </div>
       </div>
       <br><button class="btn" onclick="getChart()" data-i18n="btn_chart">Reveal Chart</button>
     </div>
@@ -174,8 +188,14 @@ footer{text-align:center;padding:50px 0 36px;color:var(--text-dim);font-size:.64
         <div class="form-group full"><label data-i18n="label_name">Name</label><input type="text" id="p1-name" data-i18n-placeholder="ph_name" placeholder="First person"/></div>
         <div class="form-group"><label data-i18n="label_dob">Date of Birth</label><input type="date" id="p1-date"/></div>
         <div class="form-group"><label data-i18n="label_tob">Time of Birth</label><input type="time" id="p1-time" value="12:00"/></div>
-        <div class="form-group"><label data-i18n="label_city">City</label><input type="text" id="p1-city" data-i18n-placeholder="ph_city" placeholder="e.g. Paris"/></div>
-        <div class="form-group"><label data-i18n="label_country">Country Code</label><input type="text" id="p1-nation" data-i18n-placeholder="ph_country" placeholder="e.g. FR" maxlength="3"/></div>
+        <div class="form-group full">
+          <label data-i18n="label_city">City</label>
+          <div class="city-wrap">
+            <input type="text" id="p1-city" data-i18n-placeholder="ph_city" placeholder="e.g. Paris" autocomplete="off" oninput="cityAutocomplete(this,'p1-nation','p1-city-dropdown')"/>
+            <input type="hidden" id="p1-nation" value="US"/>
+            <div class="city-dropdown" id="p1-city-dropdown"></div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="divider" data-i18n="divider_and">and</div>
@@ -185,8 +205,14 @@ footer{text-align:center;padding:50px 0 36px;color:var(--text-dim);font-size:.64
         <div class="form-group full"><label data-i18n="label_name">Name</label><input type="text" id="p2-name" data-i18n-placeholder="ph_name" placeholder="Second person"/></div>
         <div class="form-group"><label data-i18n="label_dob">Date of Birth</label><input type="date" id="p2-date"/></div>
         <div class="form-group"><label data-i18n="label_tob">Time of Birth</label><input type="time" id="p2-time" value="12:00"/></div>
-        <div class="form-group"><label data-i18n="label_city">City</label><input type="text" id="p2-city" data-i18n-placeholder="ph_city" placeholder="e.g. Tokyo"/></div>
-        <div class="form-group"><label data-i18n="label_country">Country Code</label><input type="text" id="p2-nation" data-i18n-placeholder="ph_country" placeholder="e.g. JP" maxlength="3"/></div>
+        <div class="form-group full">
+          <label data-i18n="label_city">City</label>
+          <div class="city-wrap">
+            <input type="text" id="p2-city" data-i18n-placeholder="ph_city" placeholder="e.g. Tokyo" autocomplete="off" oninput="cityAutocomplete(this,'p2-nation','p2-city-dropdown')"/>
+            <input type="hidden" id="p2-nation" value="US"/>
+            <div class="city-dropdown" id="p2-city-dropdown"></div>
+          </div>
+        </div>
       </div>
     </div>
     <button class="btn" onclick="getCompatibility()" data-i18n="btn_compat">Read the Stars</button>
@@ -202,8 +228,14 @@ footer{text-align:center;padding:50px 0 36px;color:var(--text-dim);font-size:.64
         <div class="form-group full"><label data-i18n="label_name">Full Name</label><input type="text" id="t-name" data-i18n-placeholder="ph_name" placeholder="Your name"/></div>
         <div class="form-group"><label data-i18n="label_dob">Date of Birth</label><input type="date" id="t-date"/></div>
         <div class="form-group"><label data-i18n="label_tob">Time of Birth</label><input type="time" id="t-time" value="12:00"/></div>
-        <div class="form-group"><label data-i18n="label_city">City</label><input type="text" id="t-city" data-i18n-placeholder="ph_city" placeholder="e.g. London"/></div>
-        <div class="form-group"><label data-i18n="label_country">Country Code</label><input type="text" id="t-nation" data-i18n-placeholder="ph_country" placeholder="e.g. GB" maxlength="3"/></div>
+        <div class="form-group full">
+          <label data-i18n="label_city">City</label>
+          <div class="city-wrap">
+            <input type="text" id="t-city" data-i18n-placeholder="ph_city" placeholder="e.g. London" autocomplete="off" oninput="cityAutocomplete(this,'t-nation','t-city-dropdown')"/>
+            <input type="hidden" id="t-nation" value="US"/>
+            <div class="city-dropdown" id="t-city-dropdown"></div>
+          </div>
+        </div>
         <div class="form-group"><label data-i18n="transit_date_label">Transit date</label><input type="date" id="t-transit-date"/></div>
       </div>
       <br><button class="btn" onclick="getTransits()" data-i18n="btn_transits">Calculate Transits</button>
@@ -243,6 +275,116 @@ footer{text-align:center;padding:50px 0 36px;color:var(--text-dim);font-size:.64
 </div>
 
 <script>
+// ── CITY AUTOCOMPLETE ─────────────────────────────────────────────────
+const _acTimers={};
+const _acCache={};
+
+async function cityAutocomplete(input, nationFieldId, dropdownId){
+  const q=input.value.trim();
+  const dd=document.getElementById(dropdownId);
+  if(q.length<2){dd.classList.remove('open');dd.innerHTML='';return;}
+
+  clearTimeout(_acTimers[dropdownId]);
+  _acTimers[dropdownId]=setTimeout(async()=>{
+    const cacheKey=q.toLowerCase();
+    if(_acCache[cacheKey]){renderCityDropdown(dd,_acCache[cacheKey],input,nationFieldId);return;}
+
+    input.classList.add('city-loading');
+    try{
+      const url=`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=6&featuretype=city&addressdetails=1`;
+      const r=await fetch(url,{headers:{'Accept-Language':'en'}});
+      const data=await r.json();
+      // deduplicate by city+country
+      const seen=new Set();
+      const results=[];
+      for(const item of data){
+        const addr=item.address||{};
+        const city=addr.city||addr.town||addr.village||addr.municipality||item.display_name.split(',')[0];
+        const country=addr.country_code?(addr.country_code.toUpperCase()):'';
+        const key=city.toLowerCase()+'|'+country;
+        if(!seen.has(key)&&city){
+          seen.add(key);
+          results.push({city,country,lat:item.lat,lon:item.lon,display:item.display_name});
+        }
+      }
+      _acCache[cacheKey]=results;
+      renderCityDropdown(dd,results,input,nationFieldId);
+    }catch(e){dd.classList.remove('open');}
+    finally{input.classList.remove('city-loading');}
+  },320);
+}
+
+function renderCityDropdown(dd, results, input, nationFieldId){
+  if(!results.length){dd.classList.remove('open');return;}
+  dd.innerHTML=results.map((r,i)=>
+    `<div class="city-option" data-idx="${i}">${r.city}<span class="city-country">${r.country}</span></div>`
+  ).join('');
+  dd.classList.add('open');
+
+  dd.querySelectorAll('.city-option').forEach((el,i)=>{
+    el.addEventListener('mousedown',e=>{
+      e.preventDefault();
+      const r=results[i];
+      input.value=r.city;
+      document.getElementById(nationFieldId).value=r.country;
+      dd.classList.remove('open');
+      dd.innerHTML='';
+      saveLastBirthData();
+    });
+  });
+}
+
+// close dropdown on outside click
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.city-wrap')){
+    document.querySelectorAll('.city-dropdown').forEach(d=>{d.classList.remove('open');});
+  }
+});
+
+// ── LOCAL STORAGE ─────────────────────────────────────────────────────
+const LS_KEY='orbis_last_birth';
+
+function saveLastBirthData(){
+  try{
+    const d={
+      name:  document.getElementById('c-name')?.value||'',
+      date:  document.getElementById('c-date')?.value||'',
+      time:  document.getElementById('c-time')?.value||'',
+      city:  document.getElementById('c-city')?.value||'',
+      nation:document.getElementById('c-nation')?.value||'',
+    };
+    if(d.name||d.city) localStorage.setItem(LS_KEY,JSON.stringify(d));
+  }catch(e){}
+}
+
+function restoreLastBirthData(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(!raw)return;
+    const d=JSON.parse(raw);
+    if(d.name)  {const el=document.getElementById('c-name');  if(el)el.value=d.name;}
+    if(d.date)  {const el=document.getElementById('c-date');  if(el)el.value=d.date;}
+    if(d.time)  {const el=document.getElementById('c-time');  if(el){el.value=d.time;checkNoonWarning(el);}}
+    if(d.city)  {const el=document.getElementById('c-city');  if(el)el.value=d.city;}
+    if(d.nation){const el=document.getElementById('c-nation');if(el)el.value=d.nation;}
+  }catch(e){}
+}
+
+// auto-save on any input change in chart form
+function bindSaveListeners(){
+  ['c-name','c-date','c-time','c-city'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.addEventListener('change',saveLastBirthData);
+  });
+}
+
+// ── AUTOSCROLL ────────────────────────────────────────────────────────
+function scrollToResult(containerId){
+  setTimeout(()=>{
+    const el=document.getElementById(containerId);
+    if(el){el.scrollIntoView({behavior:'smooth',block:'start'});}
+  },80);
+}
 const SIGN_SYMBOLS={'Aries':'♈︎','Taurus':'♉︎','Gemini':'♊︎','Cancer':'♋︎','Leo':'♌︎','Virgo':'♍︎','Libra':'♎︎','Scorpio':'♏︎','Sagittarius':'♐︎','Capricorn':'♑︎','Aquarius':'♒︎','Pisces':'♓︎'};
 const SIGN_SYMS=['♈︎','♉︎','♊︎','♋︎','♌︎','♍︎','♎︎','♏︎','♐︎','♑︎','♒︎','♓︎'];
 const SIGN_ELEM=['Fire','Earth','Air','Water','Fire','Earth','Air','Water','Fire','Earth','Air','Water'];
@@ -791,7 +933,8 @@ async function getChart(){
     const d=await res.json();
     if(!res.ok)throw new Error(d.detail);
     renderChart(d);
-  }catch(e){document.getElementById('chart-result').innerHTML=`<div class="error">Error: ${e.message}</div>`;}
+    scrollToResult('chart-result');
+    saveLastBirthData();
 }
 
 async function getCompatibility(){
@@ -804,7 +947,7 @@ async function getCompatibility(){
     if(!res.ok)throw new Error(d.detail);
     _lastCompatData=d;_lastCompatP1=p1;_lastCompatP2=p2;
     renderCompat(d,p1,p2);
-  }catch(e){document.getElementById('compat-result').innerHTML=`<div class="error">Error: ${e.message}</div>`;}
+    scrollToResult('compat-result');
 }
 
 function buildSynastryWheel(d){
@@ -1051,7 +1194,7 @@ async function getTransits(){
     if(!res.ok)throw new Error(d2.detail);
     _lastTransitData=d2;
     renderTransits(d2);
-  }catch(e){document.getElementById('transit-result').innerHTML=`<div class="error">Error: ${e.message}</div>`;}
+    scrollToResult('transit-result');
 }
 
 function renderTransits(d){
@@ -1172,6 +1315,8 @@ async function getHoroscope(sign,btn){
 
 // auto-load sky on page start
 document.addEventListener('DOMContentLoaded', ()=>{
+  restoreLastBirthData();
+  bindSaveListeners();
   // if transits tab is default active, load sky immediately
   if(document.getElementById('panel-transits').classList.contains('active')) loadSky();
 });
