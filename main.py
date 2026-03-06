@@ -319,6 +319,156 @@ async def get_horoscope(sign: str):
     return {"sign": sign, "horoscope": HOROSCOPES[sign], "date": datetime.now().strftime("%B %d, %Y")}
 
 
+class LunarData(BaseModel):
+    natal: "BirthData"
+    year: int = 0   # target year, 0 = current
+    month: int = 0  # target month, 0 = current
+
+
+def find_lunar_return(natal_moon_abs: float, from_year: int, from_month: int, from_day: int,
+                      city: str, nation: str) -> datetime:
+    """Binary-search for the next moment when transit Moon == natal Moon position."""
+    from datetime import timedelta
+
+    # start search from given date at midnight
+    dt = datetime(from_year, from_month, from_day, 0, 0)
+
+    def moon_abs(d: datetime) -> float:
+        s = AstrologicalSubject(
+            name="tmp", year=d.year, month=d.month, day=d.day,
+            hour=d.hour, minute=d.minute, city=city, nation=nation, online=True,
+        )
+        return abs_pos(s.moon.sign, s.moon.position)
+
+    def angular_diff(a: float, b: float) -> float:
+        diff = (a - b) % 360
+        if diff > 180:
+            diff -= 360
+        return diff  # signed: positive means a ahead of b
+
+    natal = natal_moon_abs % 360
+
+    # Step 1: coarse scan — hourly steps, find bracketing interval where
+    # moon crosses natal position
+    step = timedelta(hours=2)
+    prev_dt = dt
+    prev_diff = angular_diff(moon_abs(dt), natal)
+
+    for _ in range(500):  # max ~41 days at 2h steps
+        cur_dt = prev_dt + step
+        cur_diff = angular_diff(moon_abs(cur_dt), natal)
+        # sign change means we crossed natal moon
+        if prev_diff * cur_diff < 0 and abs(prev_diff) < 60:
+            break
+        prev_dt = cur_dt
+        prev_diff = cur_diff
+    else:
+        return dt  # fallback
+
+    # Step 2: binary search to minute precision
+    lo, hi = prev_dt, cur_dt
+    for _ in range(30):
+        mid = lo + (hi - lo) / 2
+        mid_diff = angular_diff(moon_abs(mid), natal)
+        if abs(mid_diff) < 0.01:
+            return mid
+        lo_diff = angular_diff(moon_abs(lo), natal)
+        if lo_diff * mid_diff < 0:
+            hi = mid
+        else:
+            lo = mid
+
+    return lo + (hi - lo) / 2
+
+
+@app.post("/api/lunar")
+async def get_lunar_return(data: LunarData):
+    try:
+        now = datetime.utcnow()
+        natal_bd = data.natal
+
+        # Build natal chart
+        natal = AstrologicalSubject(
+            name=natal_bd.name, year=natal_bd.year, month=natal_bd.month,
+            day=natal_bd.day, hour=natal_bd.hour, minute=natal_bd.minute,
+            city=natal_bd.city, nation=natal_bd.nation, online=True,
+        )
+        natal_moon_abs = abs_pos(natal.moon.sign, natal.moon.position)
+
+        # Determine search start: if year/month given use 1st of that month, else today
+        if data.year and data.month:
+            search_from = datetime(data.year, data.month, 1)
+        else:
+            search_from = datetime(now.year, now.month, now.day)
+
+        # Find lunar return moment
+        lr_dt = find_lunar_return(
+            natal_moon_abs,
+            search_from.year, search_from.month, search_from.day,
+            natal_bd.city, natal_bd.nation,
+        )
+
+        # Build lunar return chart at that moment
+        lr = AstrologicalSubject(
+            name=f"{natal_bd.name} Lunar Return",
+            year=lr_dt.year, month=lr_dt.month, day=lr_dt.day,
+            hour=lr_dt.hour, minute=lr_dt.minute,
+            city=natal_bd.city, nation=natal_bd.nation, online=True,
+        )
+
+        houses = compute_houses(lr)
+        cusp_abs = [h["abs_degree"] for h in houses] if houses else None
+
+        planet_attrs = ["sun","moon","mercury","venus","mars","jupiter","saturn",
+                        "uranus","neptune","pluto","mean_node","chiron"]
+        planets = [p for p in [extract_planet(lr, a, cusp_abs) for a in planet_attrs] if p]
+
+        # Add ASC / MC
+        for pname, attr, sym, meaning in [
+            ("Asc","first_house","AC","rising sign, outer self"),
+            ("MC","tenth_house","MC","career, public life"),
+        ]:
+            try:
+                h = getattr(lr, attr)
+                si = get_sign(h.sign)
+                planets.append({
+                    "name": pname, "attr": attr, "symbol": sym,
+                    "sign": si[0], "sign_symbol": si[1],
+                    "sign_key": h.sign[:3].capitalize(),
+                    "element": si[2], "modality": si[3],
+                    "degree": round(h.position, 2),
+                    "abs_degree": round(abs_pos(h.sign, h.position), 4),
+                    "house": "I" if pname == "Asc" else "X",
+                    "retrograde": False, "meaning": meaning,
+                })
+            except Exception:
+                pass
+
+        aspects = compute_aspects([p for p in planets if p["name"] not in ["Asc","MC"]])
+
+        asc_info = get_sign(lr.first_house.sign)
+        asc_abs  = round(abs_pos(lr.first_house.sign, lr.first_house.position), 4)
+        moon_info = get_sign(lr.moon.sign)
+
+        return {
+            "name": natal_bd.name,
+            "return_datetime": lr_dt.strftime("%d.%m.%Y %H:%M UTC"),
+            "return_date_iso": lr_dt.strftime("%Y-%m-%d"),
+            "moon_sign": moon_info[0],
+            "moon_symbol": moon_info[1],
+            "ascendant": asc_info[0],
+            "asc_symbol": asc_info[1],
+            "asc_abs": asc_abs,
+            "planets": planets,
+            "aspects": aspects,
+            "houses": houses,
+            "is_cosmogram": False,
+            "sun_sign": get_sign(lr.sun.sign)[0],
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
 class TransitData(BaseModel):
     natal: BirthData
     transit_date: str = ""   # YYYY-MM-DD, defaults to today
