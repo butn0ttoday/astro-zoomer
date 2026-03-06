@@ -283,22 +283,35 @@ async def get_compatibility(data: CompatibilityData):
             "square":      -0.9,
             "quincunx":    -0.2,
         }
+        # Key synastry axes get triple weight — these dominate chart chemistry
+        KEY_PAIRS = {
+            frozenset(["Sun","Moon"]),
+            frozenset(["Venus","Mars"]),
+            frozenset(["Sun","Venus"]),
+            frozenset(["Moon","Venus"]),
+            frozenset(["Sun","Ascendant"]),
+            frozenset(["Moon","Ascendant"]),
+        }
 
         raw = 0.0
-        max_possible = 0.0
+        best_possible = 0.0   # if every aspect were a conjunction
+        worst_possible = 0.0  # if every aspect were a square
         for a in aspects:
             pw1 = PLANET_WEIGHT.get(a["planet1"], 2)
             pw2 = PLANET_WEIGHT.get(a["planet2"], 2)
-            weight = (pw1 + pw2) / 2
+            base_weight = (pw1 + pw2) / 2
+            pair = frozenset([a["planet1"], a["planet2"]])
+            multiplier = 3.0 if pair in KEY_PAIRS else 1.0
+            weight = base_weight * multiplier
             aspect_val = ASPECT_WEIGHT.get(a["aspect"], 0)
             raw += weight * aspect_val
-            max_possible += weight * 1.0  # best case = all conjunctions
+            best_possible  += weight * 1.0   # conjunction = 1.0
+            worst_possible += weight * -0.9  # square = -0.9
 
-        if max_possible > 0:
-            # normalise to 0–1, then map to 25–95 range
-            ratio = raw / max_possible          # -1 to +1
-            score = int(25 + (ratio + 1) / 2 * 70)
-            score = min(95, max(10, score))
+        if best_possible > worst_possible:
+            # linear map: worst→1, best→100
+            score = int(1 + (raw - worst_possible) / (best_possible - worst_possible) * 99)
+            score = min(100, max(1, score))
         else:
             score = 50
 
