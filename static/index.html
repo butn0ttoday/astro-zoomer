@@ -12,23 +12,32 @@ body.day::before{background-image:radial-gradient(2px 2px at 20% 30%,rgba(201,16
 body.day h1{text-shadow:0 0 30px rgba(138,101,32,.2)}
 body.day input,body.day select{background:var(--deep);color:var(--text)}
 body.day .score-num{text-shadow:0 0 30px rgba(138,101,32,.2)}
-.theme-btn{background:transparent;border:none;cursor:pointer;font-size:1.1rem;padding:6px 10px;color:var(--text-dim);transition:all .2s;line-height:1;border-left:1px solid var(--rim)}
-.theme-btn:hover{color:var(--gold);background:var(--surface)}
+.theme-btn{background:transparent;border:none;cursor:pointer;font-size:1rem;padding:0 14px;color:var(--text-dim);transition:all .2s;line-height:1;border-left:1px solid var(--rim);height:100%;display:flex;align-items:center}
+.theme-btn:hover{color:var(--gold)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--void);color:var(--text);font-family:'Inter',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
 body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(1px 1px at 10% 20%,rgba(255,255,255,.4) 0%,transparent 100%),radial-gradient(1px 1px at 30% 60%,rgba(255,255,255,.3) 0%,transparent 100%),radial-gradient(1px 1px at 50% 10%,rgba(255,255,255,.5) 0%,transparent 100%),radial-gradient(1px 1px at 70% 80%,rgba(255,255,255,.3) 0%,transparent 100%),radial-gradient(1px 1px at 90% 40%,rgba(255,255,255,.4) 0%,transparent 100%),radial-gradient(2px 2px at 85% 65%,rgba(201,168,76,.3) 0%,transparent 100%),radial-gradient(2px 2px at 45% 30%,rgba(123,108,255,.3) 0%,transparent 100%);pointer-events:none;z-index:0}
 .container{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px}
-header{text-align:center;padding:70px 0 50px}
-.sigil{width:60px;height:60px;margin:0 auto 20px}
+header{padding:0;margin-bottom:0}
+.site-bar{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--rim);background:var(--deep);height:64px;padding:0 0 0 24px;position:sticky;top:0;z-index:90}
+.site-bar-left{display:flex;align-items:center;gap:14px}
+.site-bar-right{display:flex;align-items:stretch;height:100%;border-left:1px solid var(--rim)}
+.site-title{font-family:'Cinzel',serif;font-size:1.15rem;font-weight:600;letter-spacing:.35em;color:var(--gold);text-shadow:0 0 20px rgba(201,168,76,.25)}
+.site-tagline{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:.82rem;color:var(--silver-dim);letter-spacing:.08em}
+@media(max-width:500px){.site-tagline{display:none}}
+.sigil{width:32px;height:32px;flex-shrink:0}
 .sigil svg{width:100%;height:100%;animation:spin 40s linear infinite}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-h1{font-family:'Cinzel',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:600;letter-spacing:.35em;color:var(--gold);text-shadow:0 0 40px rgba(201,168,76,.3);margin-bottom:6px}
-.tagline{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.05rem;color:var(--silver-dim);letter-spacing:.1em}
-nav{display:flex;justify-content:center;margin-bottom:50px;border:1px solid var(--rim);overflow:hidden;width:fit-content;margin-left:auto;margin-right:auto}
-.tab{font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:.2em;padding:13px 30px;cursor:pointer;color:var(--text-dim);background:var(--deep);border:none;border-right:1px solid var(--rim);transition:all .3s ease;text-transform:uppercase}
+nav{display:flex;justify-content:center;margin:32px 0 40px;border:1px solid var(--rim);overflow:hidden;width:fit-content;margin-left:auto;margin-right:auto}
+.tab{font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:.2em;padding:13px 30px;cursor:pointer;color:var(--text-dim);background:var(--deep);border:none;border-right:1px solid var(--rim);transition:all .3s ease;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:4px}
 .tab:last-child{border-right:none}
 .tab:hover{color:var(--gold);background:var(--surface)}
 .tab.active{color:var(--gold);background:var(--surface);box-shadow:inset 0 -2px 0 var(--gold)}
+.tab-icon{font-size:1rem;display:none}
+@media(max-width:600px){
+  .tab{padding:10px 16px;font-size:0;letter-spacing:0}
+  .tab-icon{display:block;font-size:1.1rem}
+}
 .panel{display:none;animation:fadeIn .5s ease}
 .panel.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -110,12 +119,13 @@ input:focus,select:focus{border-color:var(--gold-dim)}
 .loading::after{content:'';display:inline-block;width:18px;height:18px;border:1px solid var(--rim);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin-left:10px;vertical-align:middle}
 .error{padding:16px;border:1px solid rgba(232,112,112,.3);background:rgba(232,112,112,.05);color:#e87070;font-size:.82rem;margin-top:12px}
 footer{text-align:center;padding:50px 0 36px;color:var(--text-dim);font-size:.64rem;letter-spacing:.2em;text-transform:uppercase}
-.lang-switcher{position:fixed;top:20px;right:24px;z-index:100;display:flex;gap:0;background:var(--deep);border:1px solid var(--rim);padding:0}
-.lang-btn{background:transparent;border:none;border-right:1px solid var(--rim);cursor:pointer;font-size:.68rem;padding:8px 12px;color:var(--text-dim);transition:all .2s;font-family:'Cinzel',serif;letter-spacing:.05em}
+.lang-switcher{display:flex;gap:0;height:100%}
+.lang-btn{background:transparent;border:none;border-right:1px solid var(--rim);cursor:pointer;font-size:.65rem;padding:0 12px;color:var(--text-dim);transition:all .2s;font-family:'Cinzel',serif;letter-spacing:.05em;height:100%}
 .lang-btn:last-child{border-right:none}
 .lang-btn:hover{color:var(--gold)}
 .lang-btn.active{color:var(--gold);background:var(--surface)}
-@media(max-width:700px){.form-grid,.big3,.chart-layout,.aspects-grid,.houses-grid{grid-template-columns:1fr!important}.signs-grid{grid-template-columns:repeat(3,1fr)}.tab{padding:10px 12px;font-size:.56rem}}
+@media(max-width:420px){.lang-btn{padding:0 8px;font-size:.6rem}}
+@media(max-width:700px){.form-grid,.big3,.chart-layout,.aspects-grid,.houses-grid{grid-template-columns:1fr!important}.signs-grid{grid-template-columns:repeat(3,1fr)}}
 .city-wrap{position:relative}
 .city-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--deep);border:1px solid var(--gold-dim);border-top:none;z-index:200;max-height:200px;overflow-y:auto;display:none}
 .city-dropdown.open{display:block}
@@ -127,37 +137,41 @@ footer{text-align:center;padding:50px 0 36px;color:var(--text-dim);font-size:.64
 </style>
 </head>
 <body>
-<div style="position:fixed;top:20px;left:24px;z-index:100">
-    <button class="theme-btn" id="theme-toggle" onclick="toggleTheme()" style="background:var(--deep);border:1px solid var(--rim);padding:8px 14px;font-size:1rem;cursor:pointer;color:var(--text-dim);transition:all .2s;font-family:'Cinzel',serif" title="Toggle theme">☽</button>
-  </div>
-  <div class="lang-switcher">
-    <button class="lang-btn active" onclick="setLang('en',this)">EN</button>
-    <button class="lang-btn" onclick="setLang('ru',this)">RU</button>
-    <button class="lang-btn" onclick="setLang('pl',this)">PL</button>
-    <button class="lang-btn" onclick="setLang('it',this)">IT</button>
-    <button class="lang-btn" onclick="setLang('de',this)">DE</button>
-  </div>
-  <div class="container">
-  <header>
-    <div class="sigil">
-      <svg viewBox="0 0 100 100" fill="none">
-        <circle cx="50" cy="50" r="45" stroke="#c9a84c" stroke-width="0.5" stroke-opacity="0.4"/>
-        <circle cx="50" cy="50" r="35" stroke="#c9a84c" stroke-width="0.3" stroke-opacity="0.3"/>
-        <circle cx="50" cy="50" r="3" fill="#c9a84c" fill-opacity="0.8"/>
-        <polygon points="50,8 58,28 80,20 68,40 88,50 68,60 80,80 58,72 50,92 42,72 20,80 32,60 12,50 32,40 20,20 42,28" stroke="#c9a84c" stroke-width="0.4" stroke-opacity="0.3" fill="none"/>
-        <line x1="50" y1="5" x2="50" y2="95" stroke="#c9a84c" stroke-width="0.3" stroke-opacity="0.2"/>
-        <line x1="5" y1="50" x2="95" y2="50" stroke="#c9a84c" stroke-width="0.3" stroke-opacity="0.2"/>
-      </svg>
+<header>
+  <div class="site-bar">
+    <div class="site-bar-left">
+      <div class="sigil">
+        <svg viewBox="0 0 100 100" fill="none">
+          <circle cx="50" cy="50" r="45" stroke="#c9a84c" stroke-width="0.5" stroke-opacity="0.4"/>
+          <circle cx="50" cy="50" r="35" stroke="#c9a84c" stroke-width="0.3" stroke-opacity="0.3"/>
+          <circle cx="50" cy="50" r="3" fill="#c9a84c" fill-opacity="0.8"/>
+          <polygon points="50,8 58,28 80,20 68,40 88,50 68,60 80,80 58,72 50,92 42,72 20,80 32,60 12,50 32,40 20,20 42,28" stroke="#c9a84c" stroke-width="0.4" stroke-opacity="0.3" fill="none"/>
+          <line x1="50" y1="5" x2="50" y2="95" stroke="#c9a84c" stroke-width="0.3" stroke-opacity="0.2"/>
+          <line x1="5" y1="50" x2="95" y2="50" stroke="#c9a84c" stroke-width="0.3" stroke-opacity="0.2"/>
+        </svg>
+      </div>
+      <span class="site-title">ORBIS</span>
+      <span class="site-tagline" data-i18n="tagline">the sky is your map</span>
     </div>
-    <h1>ORBIS</h1>
-    <p class="tagline" data-i18n="tagline">where starlight meets your soul</p>
-  </header>
+    <div class="site-bar-right">
+      <div class="lang-switcher">
+        <button class="lang-btn active" onclick="setLang('en',this)">EN</button>
+        <button class="lang-btn" onclick="setLang('ru',this)">RU</button>
+        <button class="lang-btn" onclick="setLang('pl',this)">PL</button>
+        <button class="lang-btn" onclick="setLang('it',this)">IT</button>
+        <button class="lang-btn" onclick="setLang('de',this)">DE</button>
+      </div>
+      <button class="theme-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle theme">☽</button>
+    </div>
+  </div>
+</header>
 
+<div class="container">
   <nav>
-    <button class="tab active" onclick="switchTab('chart',this)" data-i18n="tab_chart">Birth Chart</button>
-    <button class="tab" onclick="switchTab('compat',this)" data-i18n="tab_compat">Compatibility</button>
-    <button class="tab" onclick="switchTab('transits',this)" data-i18n="tab_transits">Transits</button>
-    <button class="tab" onclick="switchTab('horoscope',this)" data-i18n="tab_horo">Horoscope</button>
+    <button class="tab active" onclick="switchTab('chart',this)" data-i18n="tab_chart"><span class="tab-icon">☉</span>Birth Chart</button>
+    <button class="tab" onclick="switchTab('compat',this)" data-i18n="tab_compat"><span class="tab-icon">♡</span>Compatibility</button>
+    <button class="tab" onclick="switchTab('transits',this)" data-i18n="tab_transits"><span class="tab-icon">◎</span>Transits</button>
+    <button class="tab" onclick="switchTab('horoscope',this)" data-i18n="tab_horo"><span class="tab-icon">♈︎</span>Horoscope</button>
   </nav>
 
   <div class="panel active" id="panel-chart">
