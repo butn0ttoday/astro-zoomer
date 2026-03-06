@@ -117,16 +117,6 @@ input:focus,select:focus{border-color:var(--gold-dim)}
 .score-bar{width:100%;height:2px;background:var(--rim);margin:18px 0;overflow:hidden}
 .score-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));transition:width 1s ease;box-shadow:0 0 10px rgba(201,168,76,.4)}
 .compat-summary{font-family:'Cormorant Garamond',serif;font-size:1.1rem;line-height:1.8;color:var(--silver);font-style:italic;margin:18px 0;padding:18px 22px;border-left:2px solid var(--gold-dim)}
-.signs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rim);margin-bottom:24px}
-.sign-btn{background:var(--deep);border:none;padding:16px 8px;cursor:pointer;text-align:center;transition:background .2s;color:var(--text-dim)}
-.sign-btn:hover,.sign-btn.active{background:var(--surface);color:var(--gold)}
-.sign-btn .sy{font-size:1.3rem;display:block;margin-bottom:2px}
-.sign-btn .sn{font-family:'Cinzel',serif;font-size:.55rem;letter-spacing:.1em}
-.horo-result{background:var(--deep);border:1px solid var(--rim);padding:26px;position:relative;animation:fadeIn .4s ease}
-.horo-result::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent)}
-.horo-title{font-family:'Cinzel',serif;font-size:1.25rem;color:var(--gold);letter-spacing:.12em;margin-bottom:4px}
-.horo-date{font-size:.64rem;letter-spacing:.15em;color:var(--text-dim);margin-bottom:16px;text-transform:uppercase}
-.horo-body{font-family:'Cormorant Garamond',serif;font-size:1.1rem;line-height:1.9;color:var(--silver);font-style:italic}
 .divider{display:flex;align-items:center;gap:14px;margin:28px 0;color:var(--text-dim);font-size:.58rem;letter-spacing:.3em;text-transform:uppercase}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--rim)}
 .loading{text-align:center;padding:50px;color:var(--text-dim);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.05rem}
@@ -144,7 +134,7 @@ footer{text-align:center;padding:50px 0 36px;color:var(--text-dim);font-size:.64
 .lang-menu button{display:block;width:100%;background:transparent;border:none;border-bottom:1px solid var(--rim);cursor:pointer;font-size:.65rem;padding:10px 16px;color:var(--text-dim);text-align:left;font-family:'Cinzel',serif;letter-spacing:.08em;transition:all .15s}
 .lang-menu button:last-child{border-bottom:none}
 .lang-menu button:hover,.lang-menu button.active{color:var(--gold);background:var(--surface)}
-@media(max-width:700px){.form-grid,.big3,.chart-layout,.aspects-grid,.houses-grid{grid-template-columns:1fr!important}.signs-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.form-grid,.big3,.chart-layout,.aspects-grid,.houses-grid{grid-template-columns:1fr!important}}
 .city-wrap{position:relative}
 .city-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--deep);border:1px solid var(--gold-dim);border-top:none;z-index:200;max-height:200px;overflow-y:auto;display:none}
 .city-dropdown.open{display:block}
@@ -197,7 +187,6 @@ footer{text-align:center;padding:50px 0 36px;color:var(--text-dim);font-size:.64
     <button class="tab" onclick="switchTab('compat',this)" data-i18n="tab_compat"><span class="tab-icon">♡</span>Compatibility</button>
     <button class="tab" onclick="switchTab('transits',this)" data-i18n="tab_transits"><span class="tab-icon">◎</span>Transits</button>
     <button class="tab" onclick="switchTab('lunar',this)" data-i18n="tab_lunar"><span class="tab-icon">☽</span>Lunar Return</button>
-    <button class="tab" onclick="switchTab('horoscope',this)" data-i18n="tab_horo"><span class="tab-icon">♈︎</span>Horoscope</button>
   </nav>
 
   <div class="panel active" id="panel-chart">
@@ -281,24 +270,6 @@ footer{text-align:center;padding:50px 0 36px;color:var(--text-dim);font-size:.64
       <br><button class="btn" onclick="getTransits()" data-i18n="btn_transits">Calculate Transits</button>
     </div>
     <div id="transit-result"></div>
-  </div>
-
-  <div class="panel" id="panel-horoscope">
-    <div class="signs-grid">
-      <button class="sign-btn" onclick="getHoroscope('Aries',this)"><span class="sy">♈︎</span><span class="sn">Aries</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Taurus',this)"><span class="sy">♉︎</span><span class="sn">Taurus</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Gemini',this)"><span class="sy">♊︎</span><span class="sn">Gemini</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Cancer',this)"><span class="sy">♋︎</span><span class="sn">Cancer</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Leo',this)"><span class="sy">♌︎</span><span class="sn">Leo</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Virgo',this)"><span class="sy">♍︎</span><span class="sn">Virgo</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Libra',this)"><span class="sy">♎︎</span><span class="sn">Libra</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Scorpio',this)"><span class="sy">♏︎</span><span class="sn">Scorpio</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Sagittarius',this)"><span class="sy">♐︎</span><span class="sn">Sagittarius</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Capricorn',this)"><span class="sy">♑︎</span><span class="sn">Capricorn</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Aquarius',this)"><span class="sy">♒︎</span><span class="sn">Aquarius</span></button>
-      <button class="sign-btn" onclick="getHoroscope('Pisces',this)"><span class="sy">♓︎</span><span class="sn">Pisces</span></button>
-    </div>
-    <div id="horoscope-result"></div>
   </div>
 
   <div class="panel" id="panel-lunar">
@@ -920,6 +891,102 @@ function buildWheel(data){
   return s;
 }
 
+// ── DAILY READING ─────────────────────────────────────────────────────
+const DAILY_READINGS = {
+  Aries: [
+    "Mars sharpens your instincts today. The impulse you've been second-guessing is worth trusting — act before the window closes. Your fire burns cleaner when it moves forward, not inward.",
+    "Something you dismissed as finished wants another look. Aries rarely retreats, but today the strength is in the return. What you left behind hasn't left you.",
+    "Your chart's ruler pushes toward confrontation, but the real battle is interior. The external obstacle is a mirror. Win it there first, and the outside arranges itself.",
+    "Energy peaks mid-cycle. Physical movement unlocks mental clarity today — the body leads where the mind follows. Don't think your way through this one.",
+    "An old desire resurfaces with new context. You're not the same person who first wanted this. That changes what it means to pursue it — and whether you should."
+  ],
+  Taurus: [
+    "Venus slows time today in your favour. Something worth having is worth letting arrive properly. Resist the urge to force what's already in motion toward you.",
+    "Your senses are calibrated finely right now. Trust what feels wrong even if you can't articulate why — your body processes information your mind hasn't caught up with yet.",
+    "A financial or material matter needs patient attention rather than decisive action. The numbers shift in your favour if you wait for the full picture. Partial information is your only risk.",
+    "Comfort and stagnation wear the same face today. The distinction is whether warmth is feeding you or just insulating you. One question reveals the answer: what are you avoiding?",
+    "Someone underestimates your endurance. Let them. The long game is your native territory, and the outcome will be its own statement. No explanation necessary."
+  ],
+  Gemini: [
+    "Mercury accelerates your pattern recognition today. You'll see the connection others miss — but delivery matters as much as the insight. Precision over cleverness.",
+    "Two things you thought were separate turn out to share a root. Follow that thread. What looks like a distraction is actually the most direct path.",
+    "A conversation you've been putting off is ready to happen. The delay was protective; now it's costing more than the discomfort of honesty. Say the clear thing.",
+    "Your mind races between three versions of the same problem. They're not the same problem. Separate them, and one of them dissolves entirely.",
+    "Information arrives that reframes something you thought was settled. Don't resist the update — Gemini's gift is the ability to hold new maps lightly and travel faster for it."
+  ],
+  Cancer: [
+    "The Moon moves through a sensitive degree today. What surfaces emotionally is information, not interference. Let it speak before you manage it away.",
+    "Someone in your orbit needs less advice and more presence. You already know how to give this — the question is whether you're willing to be still enough for it.",
+    "A memory arrives with unexpected weight. It's not nostalgia — it's the past flagging something unresolved that's relevant now. Pay attention to what specifically surfaces.",
+    "Your instinct about a person or situation has been right for longer than you've let yourself admit. The evidence was always there. Trust is just catching up to knowing.",
+    "Boundaries drawn from fear close the wrong doors. Boundaries drawn from self-knowledge open the right ones. Today distinguishes which kind you've been building."
+  ],
+  Leo: [
+    "Your presence shifts the atmosphere of any room today — use this consciously. The attention you draw is a resource, not just a fact. What do you want to direct it toward?",
+    "Something you created or initiated is generating effects you can't fully see yet. The work was real. Let it travel without your supervision for now.",
+    "Pride is protective today in a way it sometimes isn't. What looks like ego is actually discernment — you're recognising something that doesn't deserve your generous light.",
+    "A creative impulse that arrived last week is ready to be acted on now. The timing you were waiting for is here. Imperfect execution beats perfect delay.",
+    "Someone returns wanting what they once dismissed. Your chart says receive this with grace, not triumph. The lesson landed — that's what matters, not the score."
+  ],
+  Virgo: [
+    "The detail you almost skipped is the one that matters. Mercury rewards the extra pass today. What looks like thoroughness is actually the work itself.",
+    "Your critical faculty sharpens, but aim it at systems rather than people — including yourself. The process has a flaw; the person is doing their best within it.",
+    "An improvement you've been planning is ready to implement. The conditions won't be perfect; they're good enough, and good enough executed beats perfect imagined.",
+    "Someone asks for your analysis today. Give it honestly, without softening it into uselessness. Honesty delivered with care is the most useful thing you have.",
+    "The anxiety circling a specific situation is asking you to prepare, not to retreat. What's one concrete thing you can do today to reduce the variable that's bothering you most?"
+  ],
+  Libra: [
+    "A decision you've been balancing has tipped. You already know which way — the deliberation now is theatre. Act from the knowing, not the performance of uncertainty.",
+    "Venus asks you today: what do you actually want, separate from what you think you should want? The distinction is the whole work.",
+    "Someone needs your honest perspective, not your diplomacy. The kindest thing you can offer right now is clarity. They can handle it; you're the one who's unsure.",
+    "An aesthetic or creative choice presents itself. Trust your first response — Libra's instinct for form is reliable before the second-guessing begins.",
+    "A relationship dynamic shifts in a way that initially feels like loss. Look again in three days. What feels like imbalance is actually the system correcting itself toward something better."
+  ],
+  Scorpio: [
+    "Something is ending in a way that isn't visible yet. Your chart knows before you do — that unsettled feeling is early information, not free-floating anxiety. Pay attention to what it circles.",
+    "A truth you've been protecting someone from needs to surface. Not cruelly — but clearly. The protection has become a cage, and they deserve to choose freely with full information.",
+    "Power shifts today, subtly. Notice who defers to whom, who controls the frame, who sets the terms. Understanding the architecture is how you move within it with intention.",
+    "The obsessive quality of your focus is an asset today — give it to a problem that deserves it. Scorpio's depth is wasted on surfaces; find something real to penetrate.",
+    "Transformation is rarely chosen; it's what remains when resistance finally tires. Something is asking you to stop resisting. The thing on the other side is worth the crossing."
+  ],
+  Sagittarius: [
+    "The truth you've been holding back wants out today. Say it — but aim carefully. Jupiter-ruled honesty doesn't need to hit everything in range. Choose the target that matters.",
+    "An opportunity disguised as a disruption is entering your field. The instinct that says 'not now' is habit, not wisdom. When was the last time your timing was wrong?",
+    "Your philosophy is being tested against a specific fact. The fact wins — but that's not a loss. It's the map updating. A better map is always a better outcome.",
+    "Someone from a different world than yours holds a piece of information you need. Pride about the source of knowledge is the only thing that stands between you and it.",
+    "The restlessness you feel today is directional. It's not that you need to escape — it's that something specific is calling. Listen long enough to identify what, exactly."
+  ],
+  Capricorn: [
+    "Saturn rewards those who work when no one is watching. Today's effort is the kind that compounds quietly for years. Don't measure it against today's visible return.",
+    "An authority or structure you've been operating within is showing its limits. You've outgrown the container. The question isn't whether to leave — it's how to build what comes next.",
+    "Efficiency is your native language, but today the longer path is the faster one. What looks like a shortcut skips a step that matters. Do the thing you were going to skip.",
+    "Recognition arrives for something you'd already filed as past. Let yourself receive it without redirecting to what's next. Completion deserves acknowledgment before acceleration.",
+    "Someone tests your patience today with a pace that isn't yours. The irritation is information about what you value — speed, or quality? Today you may not get both."
+  ],
+  Aquarius: [
+    "The idea that seems too large for the moment isn't. Uranus-ruled thinking often arrives before the context that makes it legible. Hold it anyway. The context is coming.",
+    "A group dynamic asks you to conform in a way that costs something essential. Your independence isn't stubbornness — it's the quality that makes your contribution worth having.",
+    "Something you believed about how systems work is being revised by evidence. Update without drama. Aquarius at its best holds theories loosely and facts seriously.",
+    "Someone who usually disagrees with you is right today. The resistance to acknowledging it is the only interesting thing here. What's actually at stake in being wrong?",
+    "The future you've been imagining is closer than it appears. One concrete action today moves it from vision to trajectory. Name the action. Then do only that."
+  ],
+  Pisces: [
+    "The boundary between intuition and projection is worth locating today. One is information; the other is autobiography. Check which source you're drawing from.",
+    "Neptune softens the edges of something that needed softening. What felt like a hard wall has more give than you thought. Approach it differently — with water, not force.",
+    "A creative current is available today that won't be this strong for a while. Whatever form your expression takes, give it more time than you planned. Something wants to come through.",
+    "Someone misreads your softness as availability for whatever they need. You can be compassionate and have limits — these aren't contradictions. Practice holding both today.",
+    "The thing you keep dreaming about (literally or otherwise) is asking for a different kind of attention. Not analysis — just acknowledgment. It already knows what it means."
+  ]
+};
+
+function getDailyReading(sunSign) {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const dayOfYear = Math.floor((now - start) / 86400000);
+  const pool = DAILY_READINGS[sunSign] || DAILY_READINGS['Aries'];
+  return pool[dayOfYear % pool.length];
+}
+
 // ── RENDER ───────────────────────────────────────────────────────────
 function parseHouse(h){
   if(!h||h==='?'||h===null||h===undefined)return'';
@@ -1022,7 +1089,7 @@ function renderChart(d){
     </div>
     ${houseSection}
     <div class="divider">${T('sec_today')}</div>
-    <p class="horoscope-text">${TH(d.sun_sign)||d.horoscope}</p>
+    <p class="horoscope-text">${getDailyReading(d.sun_sign)}</p>
   </div>`;
 }
 
@@ -1519,22 +1586,6 @@ function renderLunarReturn(d){
     </div>
     ${houseSection}
   </div>`;
-}
-
-async function getHoroscope(sign,btn){
-  document.querySelectorAll('.sign-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('horoscope-result').innerHTML=`<div class="loading">${T('loading_horo')}</div>`;
-  try{
-    const res=await fetch(`/api/horoscope/${sign}`);
-    const d=await res.json();
-    document.getElementById('horoscope-result').innerHTML=`
-    <div class="horo-result">
-      <div class="horo-title">${SIGN_ASTRO[sign]||''} ${TS(sign)}</div>
-      <div class="horo-date">${d.date}</div>
-      <p class="horo-body">${TH(sign)}</p>
-    </div>`;
-  }catch(e){document.getElementById('horoscope-result').innerHTML=`<div class="error">Error: ${e.message}</div>`;}
 }
 
 // auto-load sky on page start
